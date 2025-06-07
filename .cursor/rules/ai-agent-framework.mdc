@@ -1,0 +1,140 @@
+---
+description: Building AI agents using Hugging Face smolagents and LangChain for CRM lead generation
+globs: 
+alwaysApply: false
+---
+# AI Agent Framework Rules
+
+## Primary Framework: Hugging Face Smolagents
+
+### Implementation Requirements
+- **Core Library**: Use `smolagents` as primary AI agent framework ([Documentation](mdc:https:/huggingface.co/docs/smolagents))
+- **Model Integration**: Leverage Hugging Face transformers for NLP tasks
+- **Documentation Reference**: Follow [Hugging Face Agents Course](mdc:https:/huggingface.co/learn/agents-course) patterns
+- **Best Practices**: Implement according to [Building Good Agents Guide](mdc:https:/huggingface.co/docs/smolagents/tutorials/building_good_agents)
+- **Agent Types**: Implement specialized agents for different tasks:
+  - Search Agent: Web crawling and data discovery
+  - Classification Agent: Industry and company categorization  
+  - Validation Agent: Data verification and quality checking
+  - Extraction Agent: Information parsing from web content
+
+### Agent Architecture
+Following [smolagents documentation patterns](mdc:https:/huggingface.co/docs/smolagents/tutorials/guided_tour):
+
+```python
+from smolagents import CodeAgent, ToolCallingAgent, HfApiModel, Tool
+from transformers import pipeline
+
+class LeadGenerationAgent:
+    """
+    CRM Lead Generation Agent following HuggingFace smolagents patterns.
+    
+    References:
+    - Architecture: https://huggingface.co/learn/agents-course/unit1
+    - Implementation: https://huggingface.co/docs/smolagents/tutorials/guided_tour
+    - Best Practices: https://huggingface.co/docs/smolagents/tutorials/building_good_agents
+    """
+    
+    def __init__(self):
+        # Following smolagents documentation patterns
+        self.model = HfApiModel("Qwen/Qwen2.5-72B-Instruct")  # As per documentation
+        self.search_agent = self._create_search_agent()
+        self.classification_agent = self._create_classification_agent()
+        self.validation_agent = self._create_validation_agent()
+        
+        # Main orchestrating agent with planning (from best practices guide)
+        self.main_agent = CodeAgent(
+            tools=[self.search_agent, self.classification_agent, self.validation_agent],
+            model=self.model,
+            planning_interval=3  # Enable planning as per documentation
+        )
+```
+
+### Tool Integration
+Following [smolagents tool creation patterns](mdc:https:/huggingface.co/docs/smolagents/tutorials/creating_custom_tools):
+
+```python
+# Web scraping tool following smolagents patterns
+class WebScrapingTool(Tool):
+    name = "web_scraper"
+    description = """
+    Scrapes company data from business directories and websites.
+    Use this tool when you need to collect company information
+    from web sources like Yellow Pages, BBB, or industry directories.
+    """
+    inputs = {
+        "source": {"type": "string", "description": "Data source URL to scrape"},
+        "search_terms": {"type": "string", "description": "Search terms for finding companies"},
+        "location": {"type": "string", "description": "Geographic location filter"}
+    }
+    output_type = "string"
+    
+    def forward(self, source, search_terms, location):
+        # Implementation following rate limiting and legal compliance rules
+        return self.scrape_with_compliance(source, search_terms, location)
+
+# Industry classification tool
+class IndustryClassifierTool(Tool):
+    name = "industry_classifier"
+    description = "Classifies companies into industries using AI and NAICS codes"
+    # ... following documentation patterns
+```
+
+- **Web Search Tools**: Google search, directory search, domain lookup
+- **Data Processing Tools**: Text extraction, entity recognition, data validation  
+- **Output Tools**: CSV generation, report creation, data visualization
+- **Compliance Tools**: Rate limiting, robots.txt checking, legal validation
+
+## Fallback Framework: LangChain
+
+### When to Use LangChain
+- Smol Agents unavailable or incompatible
+- Complex multi-step reasoning required
+- Need for advanced prompt engineering
+- Integration with external APIs requiring complex workflows
+
+### LangChain Implementation
+```python
+from langchain.agents import initialize_agent, Tool
+from langchain.llms import HuggingFacePipeline
+from langchain.memory import ConversationBufferMemory
+
+class LangChainLeadAgent:
+    def __init__(self):
+        self.llm = HuggingFacePipeline.from_model_id(
+            model_id="microsoft/DialoGPT-medium",
+            task="text-generation"
+        )
+```
+
+## Agent Coordination
+
+### Multi-Agent Workflow
+1. **Orchestrator Agent**: Manages overall workflow and task distribution
+2. **Specialized Agents**: Handle specific domain tasks
+3. **Communication Protocol**: Standardized message passing between agents
+4. **State Management**: Maintain shared context across agent interactions
+
+### Error Handling
+- **Graceful Degradation**: Switch to LangChain if Smol Agents fails
+- **Retry Logic**: Implement exponential backoff for agent failures
+- **Fallback Strategies**: Simple rule-based processing if AI agents fail
+
+## Model Selection
+
+### Primary Models
+- **Text Generation**: Use lightweight models (< 1B parameters) for speed
+- **Classification**: Fine-tuned industry classification models
+- **Entity Extraction**: Named Entity Recognition models for contact info
+- **Embeddings**: Sentence transformers for semantic similarity
+
+### Model Management
+- **Local vs Remote**: Prefer local models for privacy and speed
+- **Model Caching**: Cache loaded models to reduce initialization time
+- **Version Control**: Pin model versions for reproducibility
+
+
+
+
+
+

@@ -1,0 +1,238 @@
+---
+description: Implementing multi-source data verification, confidence scoring, and quality assurance workflows
+globs: 
+alwaysApply: false
+---
+# Data Validation System Rules
+
+## Multi-Source Verification
+
+### Cross-Reference Strategy
+- **Minimum Sources**: Validate data across at least 3 independent sources
+- **Source Hierarchy**: Prioritize official sources over aggregated sources
+- **Conflict Resolution**: Implement weighted voting system for conflicting data
+- **Source Reliability**: Maintain reliability scores for each data source
+
+### Source Weighting System
+```python
+SOURCE_WEIGHTS = {
+    'official_website': 10,
+    'sec_filings': 10,
+    'government_db': 9,
+    'linkedin': 8,
+    'yellow_pages': 7,
+    'yelp': 6,
+    'business_directory': 5,
+    'social_media': 4,
+    'news_article': 4,
+    'estimated': 2,
+    'crowdsourced': 1
+}
+```
+
+### Verification Rules
+- **Exact Match**: Data exactly matches across sources (confidence: 10)  
+- **Close Match**: Data is similar with minor variations (confidence: 8)
+- **Partial Match**: Some elements match, others don't (confidence: 5)
+- **Conflict**: Sources provide contradictory information (confidence: 3)
+- **Single Source**: Only one source available (confidence: max 6)
+
+## Confidence Scoring Algorithm
+
+### Overall Confidence Calculation
+```python
+def calculate_confidence(field_data):
+    """
+    Calculate confidence score for a data field
+    Returns score from 1-10
+    """
+    sources = field_data['sources']
+    values = field_data['values']
+    
+    # Source diversity bonus
+    diversity_bonus = min(len(sources) * 1.5, 5)
+    
+    # Source quality score
+    quality_score = sum(SOURCE_WEIGHTS[s] for s in sources) / len(sources)
+    
+    # Consistency score
+    consistency = calculate_consistency(values)
+    
+    # Recency bonus
+    recency_bonus = calculate_recency_bonus(field_data['dates'])
+    
+    total_score = (quality_score + diversity_bonus + consistency + recency_bonus) / 4
+    return min(max(total_score, 1), 10)
+```
+
+### Field-Specific Validation
+
+#### Contact Information
+- **Phone Numbers**: Validate format, check if working number
+- **Email Addresses**: Validate syntax, check domain validity
+- **Addresses**: Validate against USPS database, geocode verification
+- **Websites**: Check if URL is accessible, verify domain ownership
+
+#### Company Information
+- **Company Names**: Check business registration databases
+- **Industry Codes**: Validate against NAICS/SIC code databases
+- **Employee Count**: Cross-reference multiple sources, flag outliers
+- **Revenue Data**: Validate against public filings when available
+
+#### Executive Information
+- **CEO Names**: Cross-reference LinkedIn, company websites, press releases
+- **Contact Details**: Verify executive contact information carefully
+- **Tenure Information**: Check appointment dates and current status
+
+## Data Quality Assurance
+
+### Duplicate Detection
+```python
+def detect_duplicates(companies):
+    """
+    Detect potential duplicate company records
+    """
+    similarity_threshold = 0.85
+    
+    for i, company1 in enumerate(companies):
+        for j, company2 in enumerate(companies[i+1:], i+1):
+            similarity = calculate_similarity(company1, company2)
+            if similarity > similarity_threshold:
+                flag_potential_duplicate(company1, company2, similarity)
+```
+
+### Format Standardization
+- **Phone Numbers**: Convert to (XXX) XXX-XXXX format
+- **Company Names**: Remove legal suffixes for comparison (Inc, LLC, Corp)
+- **Addresses**: Standardize using USPS address validation
+- **Names**: Convert to proper case, handle prefixes/suffixes
+- **URLs**: Ensure proper protocol, remove tracking parameters
+
+### Completeness Scoring
+```python
+def calculate_completeness(company_data):
+    """
+    Calculate completeness score based on filled fields
+    """
+    required_fields = ['company_name', 'industry', 'city', 'state']
+    high_value_fields = ['ceo_name', 'phone', 'email', 'website', 'revenue']
+    all_fields = list(FIELD_DEFINITIONS.keys())
+    
+    required_score = sum(1 for field in required_fields if company_data.get(field))
+    high_value_score = sum(1 for field in high_value_fields if company_data.get(field))
+    total_score = sum(1 for field in all_fields if company_data.get(field))
+    
+    if required_score < len(required_fields):
+        return 0  # Fail if missing required fields
+    
+    weighted_score = (
+        (required_score / len(required_fields)) * 0.4 +
+        (high_value_score / len(high_value_fields)) * 0.4 +
+        (total_score / len(all_fields)) * 0.2
+    ) * 100
+    
+    return min(weighted_score, 100)
+```
+
+## Validation Workflows
+
+### Real-Time Validation
+1. **Data Collection**: As data is scraped, apply immediate validation
+2. **Format Checking**: Validate data formats in real-time
+3. **Duplicate Detection**: Check against existing records
+4. **Quality Flagging**: Flag low-quality data for review
+
+### Batch Validation
+1. **Cross-Reference**: Compare data across all collected sources
+2. **Conflict Resolution**: Resolve conflicts using weighted voting
+3. **Completeness Check**: Identify incomplete records
+4. **Quality Scoring**: Calculate final quality scores
+
+### Manual Review Triggers
+- **Low Confidence**: Overall confidence score < 5
+- **High Conflicts**: Multiple sources with contradictory data
+- **Missing Critical**: Missing required fields
+- **Duplicate Risk**: High similarity to existing records
+- **Anomalies**: Data points that seem unusual or outliers
+
+## Error Classification
+
+### Data Quality Issues
+```python
+QUALITY_ISSUES = {
+    'missing_required': 'Missing required field data',
+    'format_invalid': 'Data format is invalid',
+    'source_conflict': 'Conflicting information from sources',
+    'outdated_data': 'Data appears to be outdated',
+    'duplicate_record': 'Potential duplicate of existing record',
+    'unverifiable': 'Cannot verify data accuracy',
+    'incomplete_record': 'Record lacks sufficient data',
+    'suspicious_data': 'Data appears suspicious or fabricated'
+}
+```
+
+### Confidence Categories
+- **High Confidence (8-10)**: Data verified across multiple reliable sources
+- **Medium Confidence (5-7)**: Data partially verified or from single reliable source  
+- **Low Confidence (3-4)**: Data from unreliable sources or conflicts present
+- **Very Low Confidence (1-2)**: Data unverified or highly suspect
+
+## Validation Rules Engine
+
+### Business Rules
+```python
+VALIDATION_RULES = {
+    'phone_format': r'^\(\d{3}\) \d{3}-\d{4}$',
+    'email_format': r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    'zip_format': r'^\d{5}(-\d{4})?$',
+    'url_format': r'^https?://[^\s/$.?#].[^\s]*$',
+    'year_range': lambda x: 1800 <= int(x) <= 2024,
+    'employee_count': lambda x: x >= 0,
+    'revenue_positive': lambda x: x > 0
+}
+```
+
+### Custom Validation Functions
+```python
+def validate_ceo_name(name, company_data):
+    """
+    Custom validation for CEO names
+    """
+    if not name or len(name.split()) < 2:
+        return False, "CEO name should have at least first and last name"
+    
+    # Check against known executive databases
+    if check_executive_database(name, company_data['company_name']):
+        return True, "Verified against executive database"
+    
+    return None, "Could not verify CEO name"
+```
+
+## Quality Reporting
+
+### Validation Reports
+```python
+def generate_validation_report(companies):
+    """
+    Generate comprehensive validation report
+    """
+    return {
+        'total_records': len(companies),
+        'high_confidence': count_by_confidence(companies, 8, 10),
+        'medium_confidence': count_by_confidence(companies, 5, 7),
+        'low_confidence': count_by_confidence(companies, 1, 4),
+        'completeness_avg': average_completeness(companies),
+        'duplicate_flags': count_duplicates(companies),
+        'manual_review_needed': count_manual_review(companies),
+        'top_quality_issues': get_top_issues(companies)
+    }
+```
+
+### Quality Metrics Dashboard
+Track key quality indicators:
+- **Overall Confidence Distribution**: Histogram of confidence scores
+- **Completeness Trends**: Average completeness over time
+- **Source Reliability**: Performance metrics per data source
+- **Validation Success Rate**: Percentage of records passing validation
+- **Manual Review Queue**: Number of records requiring manual review
+

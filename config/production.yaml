@@ -1,0 +1,280 @@
+# CRM Lead Generation AI Agent - Production Environment Configuration
+# This configuration is optimized for production deployment
+
+# Application Settings - Production Mode
+app:
+  name: "CRM Lead Generator"
+  version: "1.0.0"
+  debug: false
+  log_level: "WARNING"
+  environment: "production"
+
+# AI Agent Configuration - Production Optimized
+agents:
+  primary_framework: "smol_agents"
+  fallback_framework: "langchain"
+  
+  # Hugging Face SmolAgents Configuration
+  smol_agents:
+    model: "Qwen/Qwen2.5-72B-Instruct"
+    planning_interval: 3
+    max_iterations: 10
+    temperature: 0.1
+    max_tokens: 2000
+    
+  # LangChain Fallback Configuration
+  langchain:
+    model_name: "microsoft/DialoGPT-medium"
+    memory_type: "conversation_buffer"
+    max_memory_length: 10
+    
+  # Tool Configuration - Production Mode
+  tools:
+    web_scraper:
+      enabled: true
+      rate_limit: 2.0       # Conservative rate limiting for production
+      max_retries: 5        # More retries for reliability
+      timeout: 45           # Longer timeout for stability
+    industry_classifier:
+      enabled: true
+      confidence_threshold: 0.8  # Higher threshold for production quality
+      use_local_llm: true
+    data_validator:
+      enabled: true
+      validation_timeout: 15
+
+# Local LLM Configuration - Production
+local_llm:
+  enabled: true
+  platform: "ollama"
+  primary_model: "llama3.1:8b-instruct-q4_K_M"
+  backup_model: "mistral:7b-instruct-q4_K_M"
+  max_response_time: 8.0    # Longer timeout for production stability
+  max_retries: 5
+  base_url: "http://localhost:11434"
+  
+# API Fallback Configuration - Production
+fallback_apis:
+  openai:
+    enabled: true  # Enable for production fallback
+    model: "gpt-4o-mini"
+    max_tokens: 1000
+    temperature: 0.1
+    # API key should be set via environment variables
+  anthropic:
+    enabled: true  # Enable for production fallback
+    model: "claude-3-haiku-20240307"
+    max_tokens: 1000
+    # API key should be set via environment variables
+  huggingface:
+    enabled: true
+    model: "microsoft/DialoGPT-medium"
+    max_tokens: 1000
+
+# Web Scraping Configuration - Production Conservative
+scraping:
+  rate_limit: 3.0       # Conservative rate limiting
+  max_retries: 5        # More retries for production reliability
+  timeout: 45           # Longer timeout for stability
+  respect_robots_txt: true
+  user_agents:
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  
+# Data Sources Configuration - Production Full
+data_sources:
+  yellow_pages:
+    enabled: true
+    base_url: "https://www.yellowpages.com"
+    max_results_per_page: 30
+    priority: 1
+  
+  yelp:
+    enabled: true
+    base_url: "https://www.yelp.com"
+    max_results_per_page: 20
+    priority: 2
+  
+  better_business_bureau:
+    enabled: true
+    base_url: "https://www.bbb.org"
+    max_results_per_page: 25
+    priority: 3
+
+# Data Processing Configuration - Production
+processing:
+  batch_size: 100       # Larger batches for production efficiency
+  max_workers: 8        # More workers for production throughput
+  quality_threshold: 0.8  # Higher threshold for production quality
+  deduplication:
+    enabled: true
+    similarity_threshold: 0.9  # Higher threshold for production
+  validation:
+    phone_validation: true
+    email_validation: true
+    address_validation: true
+    website_validation: true
+
+# Output Configuration - Production
+output:
+  format: "csv"
+  include_metadata: true
+  include_quality_scores: true
+  max_records_per_file: 50000  # Larger files for production
+  output_directory: "data/outputs/production"
+  filename_template: "leads_{timestamp}_{location}.csv"
+  
+  # CSV Field Configuration - All fields for production
+  fields:
+    - "company_name"
+    - "business_address"
+    - "phone_number"
+    - "email_address"
+    - "website_url"
+    - "industry_naics_code"
+    - "industry_description"
+    - "business_description"
+    - "data_quality_score"
+    - "source_attribution"
+    - "classification_confidence"
+    - "validation_status"
+    - "last_updated"
+    - "created_date"
+    - "processing_version"
+
+# Geographic Processing - Production Full
+geographic:
+  enabled: true
+  geocoding_service: "nominatim"
+  state_subdivision:
+    enabled: true
+    large_state_threshold: 1000
+  regions:
+    west_coast: ["CA", "OR", "WA"]
+    southeast: ["FL", "GA", "SC", "NC", "VA"]
+    northeast: ["NY", "NJ", "PA", "CT", "MA", "RI", "VT", "NH", "ME"]
+    midwest: ["IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD"]
+    southwest: ["TX", "AZ", "NM", "NV", "UT", "CO"]
+    mountain: ["MT", "WY", "ID"]
+    pacific: ["AK", "HI"]
+
+# Caching Configuration - Production Optimized
+cache:
+  enabled: true
+  type: "sqlite"
+  database_path: "/opt/crm_data/cache/prod_crm_cache.db"
+  expiry_hours: 48      # Longer expiry for production efficiency
+  max_size_mb: 2000     # Larger cache for production
+
+# Logging Configuration - Production (Structured)
+logging:
+  level: "WARNING"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  handlers:
+    console:
+      enabled: false    # Disabled for production
+      level: "ERROR"
+    file:
+      enabled: true
+      level: "INFO"
+      filename: "/var/log/crm/crm_agent.log"
+      max_size_mb: 500
+      backup_count: 10
+    syslog:
+      enabled: true
+      level: "WARNING"
+      facility: "local0"
+  loggers:
+    agents: "INFO"
+    scrapers: "WARNING"
+    processors: "WARNING"
+    security: "INFO"
+
+# Gradio Frontend Configuration - Production
+gradio:
+  host: "0.0.0.0"      # Listen on all interfaces for production
+  port: 8080
+  share: false
+  auth: ["admin", "secure_password_from_env"]  # Authentication required
+  theme: "default"
+  title: "CRM Lead Generation System"
+  description: "Professional lead generation system for sales teams"
+  
+# Performance Monitoring - Production Full
+monitoring:
+  enabled: true
+  metrics_port: 9090
+  track_response_times: true
+  track_success_rates: true
+  track_resource_usage: true
+  track_business_metrics: true
+  alerting:
+    enabled: true
+    email_notifications: true
+    slack_webhooks: true
+    thresholds:
+      error_rate: 0.05
+      response_time_p95: 10.0
+      memory_usage: 0.8
+      disk_usage: 0.85
+
+# Security Configuration - Production Hardened
+security:
+  api_key_rotation_days: 30
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+  access_control:
+    enabled: true
+    max_failed_attempts: 5
+    lockout_duration_minutes: 30
+  audit_logging:
+    enabled: true
+    log_all_requests: true
+    log_data_access: true
+  data_retention:
+    logs_days: 90
+    processed_data_days: 365
+    cache_days: 7
+
+# Production-Specific Settings
+production:
+  # High availability settings
+  high_availability:
+    enabled: true
+    health_check_interval: 30  # seconds
+    graceful_shutdown_timeout: 60  # seconds
+    
+  # Backup settings
+  backup:
+    enabled: true
+    frequency: "daily"
+    retention_days: 30
+    s3_bucket: "crm-backups-prod"
+    
+  # Resource limits
+  limits:
+    max_concurrent_users: 100
+    max_requests_per_hour: 10000
+    max_scraping_threads: 20
+    memory_limit_mb: 8192
+    
+  # Database settings
+  database:
+    connection_pool_size: 20
+    query_timeout: 30
+    backup_frequency: "daily"
+    
+  # Load balancing
+  load_balancer:
+    enabled: true
+    health_check_path: "/health"
+    sticky_sessions: false
+    
+  # SSL/TLS Configuration
+  ssl:
+    enabled: true
+    cert_path: "/etc/ssl/certs/crm.crt"
+    key_path: "/etc/ssl/private/crm.key"
+    redirect_http_to_https: true 

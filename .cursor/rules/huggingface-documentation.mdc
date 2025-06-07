@@ -1,0 +1,332 @@
+---
+description: Effectively using Hugging Face documentation, smolagents guides, and Agents Course during development
+globs: 
+alwaysApply: false
+---
+
+# Hugging Face Documentation Usage Rules
+
+## Core Documentation Resources
+
+### Primary Documentation Sources
+- **[Hugging Face Agents Course](mdc:https:/huggingface.co/learn/agents-course)**: Comprehensive course from beginner to expert in AI agents
+- **[Smolagents Documentation](mdc:https:/huggingface.co/docs/smolagents)**: Complete guide for the smolagents library
+- **[Hugging Face Hub](mdc:https:/huggingface.co/docs/hub)**: Platform documentation for models, datasets, and spaces
+- **[Transformers Library](mdc:https:/huggingface.co/docs/transformers)**: Core ML library documentation
+- **[Hugging Face Blog](mdc:https:/huggingface.co/blog)**: Latest research, tutorials, and best practices
+
+### Documentation Integration Strategy
+```python
+DOCUMENTATION_WORKFLOW = {
+    'planning_phase': [
+        'Review Agents Course syllabus for architecture patterns',
+        'Study smolagents tutorials for implementation guidance',
+        'Check blog posts for latest best practices'
+    ],
+    'development_phase': [
+        'Reference specific API documentation during coding',
+        'Use code examples from documentation as templates',
+        'Follow documentation patterns for error handling'
+    ],
+    'optimization_phase': [
+        'Review performance optimization guides',
+        'Study advanced agent building techniques',
+        'Implement monitoring and evaluation patterns'
+    ]
+}
+```
+
+## Smolagents Library Integration
+
+### Core Smolagents Concepts
+Based on [smolagents documentation](mdc:https:/huggingface.co/docs/smolagents), implement these patterns:
+
+#### Agent Types
+```python
+# Follow smolagents documentation patterns
+from smolagents import CodeAgent, ToolCallingAgent, HfApiModel
+
+# CodeAgent for complex multi-step reasoning
+code_agent = CodeAgent(
+    tools=scraping_tools,
+    model=HfApiModel("Qwen/Qwen2.5-72B-Instruct"),
+    planning_interval=3  # Enable planning as per documentation
+)
+
+# ToolCallingAgent for structured tool usage
+tool_agent = ToolCallingAgent(
+    tools=validation_tools,
+    model=HfApiModel()
+)
+```
+
+#### Tool Development Patterns
+```python
+# Follow smolagents tool development guidelines
+from smolagents import Tool
+
+class DataScrapingTool(Tool):
+    name = "data_scraper"
+    description = """
+    Scrapes company data from business directories.
+    Use this tool when you need to collect company information
+    from web sources like Yellow Pages, BBB, or industry directories.
+    """
+    inputs = {
+        "source": {"type": "string", "description": "Data source to scrape"},
+        "industry": {"type": "string", "description": "Industry to target"},
+        "location": {"type": "string", "description": "Geographic location"}
+    }
+    output_type = "string"
+    
+    def forward(self, source, industry, location):
+        # Implementation following smolagents patterns
+        pass
+```
+
+### Agent Building Best Practices
+Reference [Building Good Agents Guide](mdc:https:/huggingface.co/docs/smolagents/tutorials/building_good_agents):
+
+#### Simplification Principles
+- **Reduce LLM Calls**: Combine multiple API calls into single tools
+- **Deterministic Logic**: Use rule-based functions where possible
+- **Unified Tools**: Group related functions (e.g., combine address validation + geocoding)
+
+```python
+# Good: Unified tool following documentation guidance
+class CompanyDataProcessor(Tool):
+    def forward(self, company_data):
+        # Combine validation, standardization, and enrichment
+        validated_data = self.validate_data(company_data)
+        standardized_data = self.standardize_format(validated_data)
+        enriched_data = self.enrich_with_external_apis(standardized_data)
+        return enriched_data
+
+# Avoid: Multiple separate tools requiring multiple LLM calls
+```
+
+## Hugging Face Agents Course Integration
+
+### Course Structure Application
+Based on [Agents Course curriculum](mdc:https:/huggingface.co/learn/agents-course):
+
+#### Unit 1: Agent Fundamentals
+- **Tools**: Web scrapers, data validators, industry classifiers
+- **Thoughts**: Planning and reasoning for data collection strategies
+- **Actions**: Executing scraping, validation, and classification
+- **Observations**: Monitoring data quality and collection progress
+
+#### Unit 2: Framework Integration
+Apply learnings from course Unit 2 on popular libraries:
+```python
+# Smolagents implementation (primary)
+from smolagents import CodeAgent, HfApiModel, load_tool
+
+# LangGraph fallback implementation
+from langgraph import StateGraph, END
+from langchain.agents import initialize_agent
+
+# Choose framework based on complexity and requirements
+```
+
+#### Unit 3: Real-World Use Cases
+Implement CRM lead generation following course patterns:
+- **Data Collection Agents**: Specialized for different source types
+- **Validation Agents**: Multi-source verification and quality scoring
+- **Classification Agents**: Industry and geographic categorization
+- **Output Agents**: CSV generation and report creation
+
+### Course Code Examples Integration
+Reference and adapt code patterns from course examples:
+
+```python
+# Adapted from Agents Course RAG example
+class CRMDataRetriever(Tool):
+    def __init__(self):
+        # Initialize knowledge base of company data sources
+        self.source_embeddings = self.load_source_embeddings()
+        self.retriever = self.setup_retriever()
+    
+    def forward(self, query):
+        # Retrieve relevant data sources for query
+        relevant_sources = self.retriever.get_relevant_documents(query)
+        return self.format_sources_for_agent(relevant_sources)
+```
+
+## Documentation-Driven Development Workflow
+
+### Pre-Development Documentation Review
+1. **Read Relevant Course Units**: Review applicable units from Agents Course
+2. **Study API Documentation**: Deep dive into smolagents API docs for components
+3. **Review Example Implementations**: Study similar use cases in documentation
+4. **Check Latest Blog Posts**: Review recent posts for cutting-edge techniques
+
+### Development Phase Documentation Usage
+```python
+# Documentation-driven implementation pattern
+class DocumentationGuidedAgent:
+    def __init__(self):
+        # Follow smolagents initialization patterns
+        self.tools = self.load_tools_per_documentation()
+        self.model = HfApiModel()  # As per documentation recommendations
+        self.agent = CodeAgent(
+            tools=self.tools,
+            model=self.model,
+            planning_interval=3  # Planning interval from best practices
+        )
+    
+    def implement_feature(self, feature_spec):
+        # 1. Reference documentation for similar patterns
+        doc_patterns = self.get_documentation_patterns(feature_spec)
+        
+        # 2. Adapt patterns to our use case
+        adapted_implementation = self.adapt_pattern(doc_patterns, feature_spec)
+        
+        # 3. Follow documentation error handling
+        return self.execute_with_doc_error_handling(adapted_implementation)
+```
+
+### Code Examples Repository
+Maintain references to key documentation examples:
+
+```python
+DOCUMENTATION_EXAMPLES = {
+    'basic_agent': 'https://huggingface.co/docs/smolagents/tutorials/guided_tour',
+    'rag_system': 'https://huggingface.co/docs/smolagents/examples/rag',
+    'tool_creation': 'https://huggingface.co/docs/smolagents/tutorials/creating_custom_tools',
+    'agent_evaluation': 'https://huggingface.co/docs/smolagents/tutorials/agent_evaluation',
+    'multi_agent': 'https://huggingface.co/docs/smolagents/tutorials/multi_agent',
+    'best_practices': 'https://huggingface.co/docs/smolagents/tutorials/building_good_agents'
+}
+```
+
+## Model Selection Based on Documentation
+
+### Recommended Models from Documentation
+```python
+# Models recommended in Hugging Face documentation
+RECOMMENDED_MODELS = {
+    'primary': {
+        'model': 'Qwen/Qwen2.5-72B-Instruct',
+        'use_case': 'Complex reasoning and planning tasks',
+        'documentation_ref': 'smolagents building_good_agents tutorial'
+    },
+    'lightweight': {
+        'model': 'microsoft/DialoGPT-medium',
+        'use_case': 'Simple classification and extraction',
+        'documentation_ref': 'HuggingFace transformers documentation'
+    },
+    'specialized': {
+        'model': 'distilbert-base-uncased',
+        'use_case': 'Industry classification fine-tuning',
+        'documentation_ref': 'transformers fine-tuning guides'
+    }
+}
+```
+
+### Model Configuration Following Documentation
+```python
+# Follow HuggingFace model configuration patterns
+def setup_model_per_documentation():
+    # Reference: https://huggingface.co/docs/smolagents/tutorials/using_models
+    model = HfApiModel(
+        model_id="Qwen/Qwen2.5-72B-Instruct",
+        token=os.getenv("HF_TOKEN"),  # Following security best practices
+        temperature=0.7,  # As recommended in documentation
+        max_tokens=2048
+    )
+    return model
+```
+
+## Error Handling and Debugging Patterns
+
+### Documentation-Based Debugging Workflow
+Following [smolagents debugging guidance](mdc:https:/huggingface.co/docs/smolagents/tutorials/building_good_agents):
+
+```python
+def debug_agent_following_documentation():
+    """
+    Apply documentation debugging strategies:
+    1. Use stronger LLM
+    2. Provide more guidance/information
+    3. Modify system prompt (as last resort)
+    4. Add planning intervals
+    """
+    
+    # Strategy 1: Stronger LLM (from documentation)
+    stronger_model = HfApiModel("Qwen/Qwen2.5-72B-Instruct")
+    
+    # Strategy 2: More guidance (from documentation)
+    enhanced_system_prompt = SYSTEM_PROMPT + "\nAdditional guidance: " + DOMAIN_CONTEXT
+    
+    # Strategy 3: Planning intervals (from documentation)
+    agent = CodeAgent(
+        tools=tools,
+        model=stronger_model,
+        system_prompt=enhanced_system_prompt,
+        planning_interval=2  # Frequent planning for complex tasks
+    )
+    
+    return agent
+```
+
+## Continuous Learning and Updates
+
+### Documentation Update Monitoring
+- **Subscribe to HuggingFace Blog**: Monitor for new agent-related posts
+- **Check Course Updates**: Regularly review Agents Course for new content
+- **Follow Documentation Changes**: Track updates to smolagents documentation
+- **Community Engagement**: Participate in HuggingFace community discussions
+
+### Implementation Update Workflow
+```python
+def update_implementation_with_new_docs():
+    """
+    Regular workflow to integrate new documentation insights
+    """
+    # 1. Review latest documentation updates
+    latest_patterns = check_documentation_updates()
+    
+    # 2. Identify applicable improvements
+    improvements = identify_applicable_patterns(latest_patterns)
+    
+    # 3. Plan integration of new patterns
+    integration_plan = plan_pattern_integration(improvements)
+    
+    # 4. Implement updates following documentation
+    implement_documentation_updates(integration_plan)
+```
+
+## Documentation Reference Integration
+
+### Inline Documentation References
+```python
+class LeadGenerationAgent:
+    """
+    CRM Lead Generation Agent following HuggingFace patterns.
+    
+    References:
+    - Architecture: https://huggingface.co/learn/agents-course/unit1
+    - Implementation: https://huggingface.co/docs/smolagents/tutorials/guided_tour
+    - Best Practices: https://huggingface.co/docs/smolagents/tutorials/building_good_agents
+    """
+    
+    def __init__(self):
+        # Following smolagents initialization patterns
+        # Ref: https://huggingface.co/docs/smolagents/v1.8.0/en/tutorials/building_good_agents
+        pass
+```
+
+### Documentation-Driven Code Comments
+```python
+# Following HuggingFace Agents Course Unit 2 patterns
+def create_specialized_agents():
+    # Multi-agent approach as recommended in course
+    search_agent = create_search_agent()  # Course Unit 3 patterns
+    validation_agent = create_validation_agent()  # Documentation best practices
+    
+    # Agent coordination following smolagents multi-agent tutorials
+    # Ref: https://huggingface.co/docs/smolagents/tutorials/multi_agent
+    return coordinate_agents(search_agent, validation_agent)
+```
+

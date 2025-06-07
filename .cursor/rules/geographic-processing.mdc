@@ -1,0 +1,281 @@
+---
+description: Processing geographic queries, state-based data collection, and intelligent geographic subdivision
+globs: 
+alwaysApply: false
+---
+# Geographic Processing Rules
+
+## Intelligent Geographic Breakdown
+
+### Geographic Scope Intelligence
+- **Natural Language Processing**: Parse user prompts for geographic specifications
+- **Automatic Subdivision**: Break down large geographic areas into manageable units
+- **Adaptive Granularity**: Adjust detail level based on data density and user needs
+- **Coverage Optimization**: Ensure comprehensive coverage without overlap
+
+### Geographic Hierarchy
+```python
+GEOGRAPHIC_HIERARCHY = {
+    'country': ['United States'],
+    'regions': ['Northeast', 'Southeast', 'Midwest', 'Southwest', 'West'],
+    'states': ['Alabama', 'Alaska', 'Arizona', ...],  # All 50 states
+    'metro_areas': ['New York-Newark-Jersey City', 'Los Angeles-Long Beach-Anaheim', ...],
+    'counties': ['Jefferson County, AL', 'Mobile County, AL', ...],
+    'cities': ['Birmingham, AL', 'Montgomery, AL', ...]
+}
+```
+
+## State-Based Processing
+
+### All 50 States Coverage
+```python
+US_STATES = {
+    'AL': {'name': 'Alabama', 'region': 'Southeast', 'major_cities': ['Birmingham', 'Montgomery', 'Mobile']},
+    'AK': {'name': 'Alaska', 'region': 'West', 'major_cities': ['Anchorage', 'Fairbanks', 'Juneau']},
+    'AZ': {'name': 'Arizona', 'region': 'Southwest', 'major_cities': ['Phoenix', 'Tucson', 'Mesa']},
+    # ... all 50 states with metadata
+}
+```
+
+### State-Specific Processing Rules
+- **Population Density**: Adjust search intensity based on state population
+- **Economic Centers**: Focus on major metropolitan areas first
+- **Industry Concentrations**: Target known industry clusters within states
+- **Data Source Availability**: Adapt to state-specific data source availability
+
+## Geographic Query Processing
+
+### Natural Language Geographic Parsing
+```python
+def parse_geographic_scope(user_prompt):
+    """
+    Extract geographic specifications from user prompts
+    """
+    geographic_patterns = {
+        'all_states': r'(all|every|each) state[s]?',
+        'specific_states': r'(in|from) ([A-Z][a-z]+(,?\s*[A-Z][a-z]+)*)',
+        'regions': r'(northeast|southeast|midwest|southwest|west|pacific|atlantic)',
+        'metro_areas': r'(metro|metropolitan) area[s]?',
+        'nationwide': r'(nationwide|national|across the country)'
+    }
+    
+    scope = {}
+    for pattern_type, pattern in geographic_patterns.items():
+        matches = re.findall(pattern, user_prompt.lower())
+        if matches:
+            scope[pattern_type] = matches
+    
+    return scope
+```
+
+### Geographic Expansion Logic
+```python
+def expand_geographic_scope(parsed_scope):
+    """
+    Convert parsed geographic scope into specific processing targets
+    """
+    targets = []
+    
+    if 'all_states' in parsed_scope or 'nationwide' in parsed_scope:
+        targets = list(US_STATES.keys())
+    elif 'specific_states' in parsed_scope:
+        targets = parse_state_names(parsed_scope['specific_states'])
+    elif 'regions' in parsed_scope:
+        targets = get_states_by_region(parsed_scope['regions'])
+    
+    return targets
+```
+
+## Adaptive Geographic Subdivision
+
+### Subdivision Rules
+```python
+SUBDIVISION_RULES = {
+    'high_density_states': {
+        'states': ['CA', 'TX', 'FL', 'NY', 'PA'],
+        'subdivision': 'metro_areas',
+        'threshold': 1000  # companies per subdivision
+    },
+    'medium_density_states': {
+        'states': ['IL', 'OH', 'GA', 'NC', 'MI'],
+        'subdivision': 'major_cities',
+        'threshold': 500
+    },
+    'low_density_states': {
+        'states': ['WY', 'VT', 'ND', 'SD', 'DE'],
+        'subdivision': 'statewide',
+        'threshold': 100
+    }
+}
+```
+
+### Dynamic Subdivision Algorithm
+```python
+def determine_subdivision_strategy(state, industry, estimated_company_count):
+    """
+    Determine optimal subdivision strategy for a state/industry combination
+    """
+    if estimated_company_count > 2000:
+        return 'county_level'
+    elif estimated_company_count > 500:
+        return 'metro_areas'
+    elif estimated_company_count > 100:
+        return 'major_cities'
+    else:
+        return 'statewide'
+```
+
+## Geographic Data Standardization
+
+### Address Standardization
+```python
+def standardize_address(raw_address, city, state, zip_code):
+    """
+    Standardize address format using USPS standards
+    """
+    standardized = {
+        'street_address': clean_street_address(raw_address),
+        'city': standardize_city_name(city),
+        'state': standardize_state_code(state),
+        'zip_code': standardize_zip_code(zip_code),
+        'county': get_county_from_zip(zip_code),
+        'metro_area': get_metro_area(city, state)
+    }
+    return standardized
+```
+
+### Geographic Validation
+- **Address Verification**: Validate addresses against USPS database
+- **Geocoding**: Convert addresses to latitude/longitude coordinates
+- **County Assignment**: Determine county from ZIP code or city/state
+- **Metro Area Assignment**: Assign to appropriate metropolitan statistical area
+
+## Regional Processing Strategies
+
+### Region-Specific Approaches
+```python
+REGIONAL_STRATEGIES = {
+    'Northeast': {
+        'characteristics': 'High density, established businesses, strong government presence',
+        'data_sources': ['sec_filings', 'state_databases', 'business_directories'],
+        'search_intensity': 'high',
+        'special_considerations': 'Many historical companies, complex corporate structures'
+    },
+    'Southeast': {
+        'characteristics': 'Growing markets, diverse industries, strong manufacturing',
+        'data_sources': ['chambers_of_commerce', 'industry_associations', 'local_directories'],
+        'search_intensity': 'medium',
+        'special_considerations': 'Rapid growth areas, emerging companies'
+    },
+    'Midwest': {
+        'characteristics': 'Manufacturing hub, agriculture, established industries',
+        'data_sources': ['manufacturing_directories', 'agricultural_databases', 'trade_associations'],
+        'search_intensity': 'medium',
+        'special_considerations': 'Traditional industries, family-owned businesses'
+    },
+    'Southwest': {
+        'characteristics': 'Technology growth, energy sector, emerging markets',
+        'data_sources': ['tech_directories', 'energy_databases', 'startup_databases'],
+        'search_intensity': 'high',
+        'special_considerations': 'Rapid growth, new company formations'
+    },
+    'West': {
+        'characteristics': 'Technology center, innovation, diverse economy',
+        'data_sources': ['tech_databases', 'venture_capital_databases', 'innovation_hubs'],
+        'search_intensity': 'very_high',
+        'special_considerations': 'High-growth companies, frequent changes'
+    }
+}
+```
+
+## Geographic Coverage Optimization
+
+### Coverage Algorithms
+```python
+def optimize_geographic_coverage(industry, target_states, resource_constraints):
+    """
+    Optimize geographic coverage based on industry distribution and resources
+    """
+    # Prioritize states by industry concentration
+    industry_concentration = get_industry_concentration_by_state(industry)
+    
+    # Sort states by priority score
+    priority_scores = {}
+    for state in target_states:
+        score = calculate_priority_score(
+            state, 
+            industry_concentration.get(state, 0),
+            resource_constraints
+        )
+        priority_scores[state] = score
+    
+    # Return optimized processing order
+    return sorted(priority_scores.items(), key=lambda x: x[1], reverse=True)
+```
+
+### Resource Allocation
+- **Processing Time**: Allocate more time to high-density areas
+- **Data Source Priority**: Focus on most productive sources per region
+- **Quality vs Quantity**: Balance comprehensive coverage with data quality
+- **Parallel Processing**: Process multiple low-density areas simultaneously
+
+## Geographic Output Organization
+
+### File Organization by Geography
+```python
+OUTPUT_STRUCTURE = {
+    'by_state': '/outputs/{industry}/{state}/{industry}_{state}_{date}.csv',
+    'by_region': '/outputs/{industry}/regions/{region}_{industry}_{date}.csv',
+    'by_metro': '/outputs/{industry}/metro_areas/{metro_area}_{industry}_{date}.csv',
+    'national': '/outputs/{industry}/national/{industry}_national_{date}.csv'
+}
+```
+
+### Geographic Metadata
+```python
+GEOGRAPHIC_METADATA = {
+    'processing_scope': 'Geographic area processed',
+    'subdivision_method': 'How area was subdivided',
+    'coverage_completeness': 'Percentage of area covered',
+    'geographic_distribution': 'Distribution of companies by sub-region',
+    'population_density_factor': 'How population density affected search',
+    'regional_characteristics': 'Key characteristics of the region'
+}
+```
+
+## Special Geographic Considerations
+
+### Multi-State Companies
+- **Headquarters Identification**: Determine primary business location
+- **Multi-Location Tracking**: Track companies with multiple locations
+- **Regional vs National**: Distinguish regional from national companies
+- **Subsidiary Handling**: Handle subsidiaries in different states
+
+### Geographic Data Quality
+```python
+def validate_geographic_data(company_data):
+    """
+    Validate geographic information for consistency and accuracy
+    """
+    validations = {
+        'state_city_match': validate_city_state_combination(
+            company_data['city'], 
+            company_data['state']
+        ),
+        'zip_state_match': validate_zip_state_combination(
+            company_data['zip'], 
+            company_data['state']
+        ),
+        'address_geocoding': geocode_address(company_data['address']),
+        'service_area_logic': validate_service_area_logic(company_data)
+    }
+    return validations
+```
+
+### Border and Multi-State Considerations
+- **Border Cities**: Handle cities that serve multiple states
+- **Multi-State Operations**: Companies operating across state lines
+- **Regional Service Areas**: Companies serving multi-state regions
+- **Interstate Commerce**: Companies with interstate business models
+
+

@@ -1,0 +1,93 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**Task**: Central navigation hub for all CRM lead generation rules - reference this first in every development request
+
+# Master CRM Lead Generation Rules
+
+## Project Overview
+This is the master rule file for the CRM Lead Generation AI Agent project. Reference this file in every request to access the complete rule system for building a comprehensive lead generation system.
+
+## Specialized Rule Files
+
+### Core Architecture Rules
+- **[AI Agent Framework](mdc:.cursor/rules/ai-agent-framework.mdc)**: Hugging Face Smolagents implementation and LangChain fallback
+- **[System Architecture](mdc:.cursor/rules/system-architecture.mdc)**: Modular design patterns and code organization
+- **[Configuration Management](mdc:.cursor/rules/configuration-management.mdc)**: External config files and environment setup
+- **[HuggingFace Documentation](mdc:.cursor/rules/huggingface-documentation.mdc)**: Comprehensive guide for using HF documentation effectively
+- **[Local LLM Integration](mdc:.cursor/rules/local-llm-integration.mdc)**: Local LLM setup with API fallbacks for cost-effective AI processing
+
+### Data Collection Rules
+- **[Web Scraping Guidelines](mdc:.cursor/rules/web-scraping-guidelines.mdc)**: Rate limiting, legal compliance, and scraping best practices
+- **[Data Sources Integration](mdc:.cursor/rules/data-sources-integration.mdc)**: Business directories, government databases, social media APIs
+- **[Geographic Processing](mdc:.cursor/rules/geographic-processing.mdc)**: State-based processing and intelligent geographic breakdown
+
+### Data Processing Rules
+- **[Industry Classification](mdc:.cursor/rules/industry-classification.mdc)**: NAICS codes, keyword matching, and AI-powered categorization
+- **[Data Validation System](mdc:.cursor/rules/data-validation-system.mdc)**: Multi-source verification and confidence scoring
+- **[Data Quality Assurance](mdc:.cursor/rules/data-quality-assurance.mdc)**: Duplicate detection, standardization, and completeness scoring
+
+### Output and Storage Rules
+- **[CSV Output Specifications](mdc:.cursor/rules/csv-output-specifications.mdc)**: Field definitions and file structure requirements
+- **[CRM Data Fields](mdc:.cursor/rules/crm-data-fields.mdc)**: Comprehensive field definitions for sales intelligence
+- **[File Organization](mdc:.cursor/rules/file-organization.mdc)**: Directory structure and naming conventions
+
+### Operational Rules
+- **[Performance Requirements](mdc:.cursor/rules/performance-requirements.mdc)**: Scalability, memory management, and monitoring
+- **[Error Handling](mdc:.cursor/rules/error-handling.mdc)**: Recovery mechanisms and graceful degradation
+- **[Logging and Monitoring](mdc:.cursor/rules/logging-monitoring.mdc)**: Comprehensive logging and progress tracking
+
+### Development Guidelines
+- **[Code Standards](mdc:.cursor/rules/code-standards.mdc)**: Python coding standards and best practices
+- **[Testing Requirements](mdc:.cursor/rules/testing-requirements.mdc)**: Unit tests, integration tests, and validation procedures
+- **[Deployment Guidelines](mdc:.cursor/rules/deployment-guidelines.mdc)**: Environment setup and deployment procedures
+- **[Development Workflow](mdc:.cursor/rules/development-workflow.mdc)**: Git workflow, code review, and CI/CD processes
+- **[Requirements Management](mdc:.cursor/rules/requirements-management.mdc)**: Requirements documentation and lifecycle management
+- **[Development Task Management](mdc:.cursor/rules/development-task-management.mdc)**: Granular task tracking and project management
+- **[Project Management](mdc:.cursor/rules/project-management.mdc)**: Sprint management, milestone tracking, and communication protocols
+
+## Quick Reference Commands
+
+### When Starting Development
+1. **First**: Review [Requirements Management](mdc:.cursor/rules/requirements-management.mdc) and check [Requirements.md](mdc:Requirements.md)
+2. Check [Development Task Management](mdc:.cursor/rules/development-task-management.mdc) and review [devtasks.md](mdc:devtasks.md)
+3. Follow [Development Workflow](mdc:.cursor/rules/development-workflow.mdc) for git and code review processes
+4. Review [HuggingFace Documentation](mdc:.cursor/rules/huggingface-documentation.mdc) for documentation usage patterns
+5. Study [Hugging Face Agents Course](mdc:https:/huggingface.co/learn/agents-course) relevant units
+6. Review [System Architecture](mdc:.cursor/rules/system-architecture.mdc) for overall structure
+7. Check [AI Agent Framework](mdc:.cursor/rules/ai-agent-framework.mdc) for agent implementation
+8. Setup [Local LLM Integration](mdc:.cursor/rules/local-llm-integration.mdc) for cost-effective AI processing
+
+### When Implementing Scrapers
+1. Follow [Web Scraping Guidelines](mdc:.cursor/rules/web-scraping-guidelines.mdc) for compliance
+2. Use [Data Sources Integration](mdc:.cursor/rules/data-sources-integration.mdc) for source-specific rules
+3. Apply [Geographic Processing](mdc:.cursor/rules/geographic-processing.mdc) for location handling
+
+### When Processing Data
+1. Implement [Industry Classification](mdc:.cursor/rules/industry-classification.mdc) logic
+2. Apply [Data Validation System](mdc:.cursor/rules/data-validation-system.mdc) checks
+3. Use [Data Quality Assurance](mdc:.cursor/rules/data-quality-assurance.mdc) for cleanup
+
+### When Generating Output
+1. Follow [CSV Output Specifications](mdc:.cursor/rules/csv-output-specifications.mdc) format
+2. Include all [CRM Data Fields](mdc:.cursor/rules/crm-data-fields.mdc) requirements
+3. Organize using [File Organization](mdc:.cursor/rules/file-organization.mdc) structure
+
+## Development Phases
+1. **Phase 1**: MVP with basic scraping and CSV output
+2. **Phase 2**: AI-powered classification and validation
+3. **Phase 3**: Multi-state processing and comprehensive sources
+4. **Phase 4**: Advanced monitoring and API integration
+
+## Usage Instructions
+- Always reference this master rule in development requests
+- Call specific rule files when working on particular components
+- Follow the phase-based development approach
+- Maintain consistency across all specialized rules
+
+
+
+
+

@@ -1,0 +1,6 @@
+company_name,business_address,phone_number,website_url,business_description,isp_type,service_coverage,geographic_scope,states_served,naics_code,industry_description,data_quality_score,confidence_score,source_attribution
+Spectrum,Multiple locations in Arizona,(855) 243-8892,https://www.spectrum.com,"Cable internet, TV, and phone services in Arizona",Cable,Statewide,,,517311,Internet Service Providers,0.85,85,state_isp_database
+AT&T,Multiple locations in Arizona,(800) 288-2020,https://www.att.com,Internet and telecommunications services in Arizona,Fiber/DSL,Statewide,,,517311,Internet Service Providers,0.85,85,state_isp_database
+Viasat,Satellite coverage in Arizona,(855) 810-1308,https://www.viasat.com,Satellite internet services covering Arizona,Satellite,Statewide,,,517311,Internet Service Providers,0.85,85,state_isp_database
+HughesNet,Satellite coverage in Arizona,(866) 347-3292,https://www.hughesnet.com,Satellite internet services in Arizona,Satellite,Statewide,,,517311,Internet Service Providers,0.85,85,state_isp_database
+Cox Communications,Major metro areas in Arizona,(844) 297-2142,https://www.cox.com,Cable internet and TV services in Arizona,Cable,Metro Areas,,,517311,Internet Service Providers,0.85,85,state_isp_database

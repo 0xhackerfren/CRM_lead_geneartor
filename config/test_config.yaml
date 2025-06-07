@@ -1,0 +1,173 @@
+agents:
+  fallback_framework: langchain
+  langchain:
+    max_memory_length: 5
+    memory_type: conversation_buffer
+    model_name: microsoft/DialoGPT-medium
+  primary_framework: smol_agents
+  smol_agents:
+    max_iterations: 5
+    max_tokens: 1000
+    model: Qwen/Qwen2.5-72B-Instruct
+    planning_interval: 2
+    temperature: 0.1
+  tools:
+    data_validator:
+      enabled: true
+      validation_timeout: 5
+    industry_classifier:
+      confidence_threshold: 0.6
+      enabled: true
+      use_local_llm: true
+    web_scraper:
+      enabled: true
+      max_retries: 2
+      rate_limit: 0.5
+      timeout: 15
+app:
+  debug: true
+  environment: development
+  log_level: DEBUG
+  name: CRM Lead Generator (Development)
+  version: 1.0.0-dev
+cache:
+  database_path: data/cache/dev_crm_cache.db
+  enabled: true
+  expiry_hours: 4
+  max_size_mb: 100
+  type: sqlite
+data_sources:
+  better_business_bureau:
+    base_url: https://www.bbb.org
+    enabled: false
+    max_results_per_page: 10
+    priority: 3
+  yellow_pages:
+    base_url: https://www.yellowpages.com
+    enabled: true
+    max_results_per_page: 10
+    priority: 1
+  yelp:
+    base_url: https://www.yelp.com
+    enabled: true
+    max_results_per_page: 10
+    priority: 2
+development:
+  limits:
+    daily_scraping_limit: 1000
+    max_concurrent_tasks: 2
+    max_test_requests: 100
+  test_data:
+    enabled: true
+    mock_responses: true
+    sample_size: 10
+  tools:
+    debug_mode: true
+    hot_reload: true
+    mock_external_apis: false
+fallback_apis:
+  anthropic:
+    enabled: false
+    max_tokens: 500
+    model: claude-3-haiku-20240307
+  huggingface:
+    enabled: true
+    max_tokens: 500
+    model: microsoft/DialoGPT-medium
+  openai:
+    enabled: false
+    max_tokens: 500
+    model: gpt-4o-mini
+    temperature: 0.1
+geographic:
+  enabled: true
+  geocoding_service: nominatim
+  regions:
+    test_region:
+    - NC
+    - SC
+  state_subdivision:
+    enabled: false
+    large_state_threshold: 100
+gradio:
+  auth: null
+  description: Development environment for CRM lead generation AI agent
+  host: 127.0.0.1
+  port: 7860
+  share: false
+  theme: default
+  title: CRM Lead Generator (Development)
+local_llm:
+  backup_model: mistral:7b-instruct-q4_K_M
+  base_url: http://localhost:11434
+  enabled: true
+  max_response_time: 3.0
+  max_retries: 2
+  platform: ollama
+  primary_model: llama3.1:8b-instruct-q4_K_M
+logging:
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
+  handlers:
+    console:
+      enabled: true
+      level: DEBUG
+    file:
+      backup_count: 3
+      enabled: true
+      filename: logs/dev_crm_agent.log
+      level: DEBUG
+      max_size_mb: 50
+  level: DEBUG
+  loggers:
+    agents: DEBUG
+    processors: DEBUG
+    scrapers: DEBUG
+monitoring:
+  enabled: true
+  metrics_port: 9091
+  track_resource_usage: false
+  track_response_times: true
+  track_success_rates: true
+output:
+  fields:
+  - company_name
+  - business_address
+  - phone_number
+  - email_address
+  - website_url
+  - industry_naics_code
+  - industry_description
+  - business_description
+  - data_quality_score
+  - source_attribution
+  - classification_confidence
+  - validation_status
+  - last_updated
+  filename_template: dev_leads_{timestamp}_{location}.csv
+  format: csv
+  include_metadata: true
+  include_quality_scores: true
+  max_records_per_file: 1000
+  output_directory: data/outputs/dev
+processing:
+  batch_size: 10
+  deduplication:
+    enabled: true
+    similarity_threshold: 0.8
+  max_workers: 2
+  quality_threshold: 0.5
+  validation:
+    address_validation: false
+    email_validation: true
+    phone_validation: true
+    website_validation: true
+scraping:
+  max_retries: 2
+  rate_limit: 1.0
+  respect_robots_txt: true
+  timeout: 15
+  user_agents:
+  - Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)
+    Chrome/91.0.4472.124 Safari/537.36
+security:
+  api_key_rotation_days: 90

@@ -1,0 +1,372 @@
+---
+description: Creating branches, writing commits, code reviews, CI/CD setup, pull requests, release management, dev environment setup
+globs: 
+alwaysApply: false
+---
+# Development Workflow Rule
+## Overview
+Establish a comprehensive development workflow that ensures code quality, maintainability, and efficient collaboration throughout the CRM lead generation project lifecycle.
+
+## Git Workflow Strategy
+
+### Branch Structure
+```
+main (production-ready code)
+├── develop (integration branch)
+│   ├── feature/TASK-001-web-scraper
+│   ├── feature/TASK-002-llm-integration
+│   ├── bugfix/TASK-050-rate-limiting-fix
+│   └── hotfix/TASK-100-critical-security-patch
+└── release/v1.0.0 (release preparation)
+```
+
+### Branch Naming Conventions
+- **Feature**: `feature/TASK-XXX-brief-description`
+- **Bugfix**: `bugfix/TASK-XXX-brief-description`
+- **Hotfix**: `hotfix/TASK-XXX-brief-description`
+- **Release**: `release/vX.Y.Z`
+- **Experimental**: `experiment/brief-description`
+
+### Commit Message Format
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types**: feat, fix, docs, style, refactor, test, chore
+**Examples**:
+```
+feat(scraper): add rate limiting to web scraper
+
+Implement exponential backoff and request queuing to comply
+with website terms of service and prevent IP blocking.
+
+Closes TASK-001
+```
+
+## Development Lifecycle
+
+### 1. Planning Phase
+- [ ] Review [Requirements.md](mdc:Requirements.md) for task context
+- [ ] Check [devtasks.md](mdc:devtasks.md) for current priorities
+- [ ] Estimate effort and identify dependencies  
+- [ ] Create feature branch from develop
+- [ ] Update task status to "In Progress"
+
+### 2. Implementation Phase
+- [ ] Follow [Code Standards](mdc:.cursor/rules/code-standards.mdc)
+- [ ] Implement core functionality
+- [ ] Write unit tests (minimum 80% coverage)
+- [ ] Update documentation as needed
+- [ ] Test locally with sample data
+
+### 3. Review Phase
+- [ ] Self-review code for quality and standards
+- [ ] Run full test suite locally
+- [ ] Create pull request with detailed description
+- [ ] Request code review from team members
+- [ ] Address review feedback promptly
+
+### 4. Integration Phase
+- [ ] Merge approved changes to develop branch
+- [ ] Run integration tests
+- [ ] Update task status to "Complete"
+- [ ] Deploy to staging environment for validation
+- [ ] Update progress tracking in devtasks.md
+
+## Code Review Process
+
+### Pull Request Template
+```markdown
+## Description
+Brief description of changes and motivation
+
+## Type of Change
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that causes existing functionality to change)
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Integration tests pass
+- [ ] Manual testing completed
+- [ ] Performance impact assessed
+
+## Checklist
+- [ ] Code follows project style guidelines
+- [ ] Self-review completed
+- [ ] Documentation updated
+- [ ] Tests added for new functionality
+- [ ] All tests pass locally
+
+## Related Tasks
+- Closes TASK-XXX
+- Related to TASK-YYY
+
+## Screenshots/Examples
+[If applicable, add screenshots or code examples]
+```
+
+### Review Criteria
+**Code Quality**:
+- [ ] Follows Python PEP 8 style guidelines
+- [ ] Proper error handling and logging
+- [ ] No hardcoded values or magic numbers
+- [ ] Adequate comments and docstrings
+
+**Functionality**:
+- [ ] Meets acceptance criteria from task
+- [ ] Handles edge cases appropriately
+- [ ] Performance is acceptable
+- [ ] Security considerations addressed
+
+**Testing**:
+- [ ] Unit tests cover new functionality
+- [ ] Tests are meaningful and comprehensive
+- [ ] Integration points are tested
+- [ ] Error scenarios are tested
+
+### Review Timeline
+- **Initial Review**: Within 24 hours of PR creation
+- **Follow-up Reviews**: Within 8 hours of changes
+- **Final Approval**: Same day as final review
+- **Merge**: Immediately after approval (automated)
+
+## Continuous Integration
+
+### Automated Testing Pipeline
+```yaml
+# .github/workflows/ci.yml (example structure)
+name: CI Pipeline
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Run tests
+      run: pytest tests/ --cov=src/
+    - name: Lint code
+      run: flake8 src/
+    - name: Type checking
+      run: mypy src/
+```
+
+### Quality Gates
+**Pre-commit Hooks**:
+- Code formatting (black, isort)
+- Linting (flake8, pylint)
+- Type checking (mypy)
+- Secret scanning
+
+**Pipeline Checks**:
+- Unit test coverage >80%
+- Integration tests pass
+- Security vulnerability scan
+- Code quality metrics
+
+### Deployment Strategy
+**Development Environment**:
+- Automatic deployment on develop branch updates
+- Feature flags for incomplete features
+- Comprehensive logging and monitoring
+
+**Staging Environment**:
+- Manual deployment from develop branch
+- Production-like data and configuration
+- User acceptance testing environment
+
+**Production Environment**:
+- Manual deployment from main branch
+- Blue-green deployment strategy
+- Rollback capability within 5 minutes
+
+## Development Environment Setup
+
+### Local Development Requirements
+```bash
+# Create virtual environment
+python -m venv crm_venv
+source crm_venv/bin/activate  # Linux/Mac
+# or
+crm_venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+# Setup pre-commit hooks
+pre-commit install
+
+# Initialize local database
+python scripts/init_db.py
+
+# Run tests to verify setup
+pytest tests/
+```
+
+### Development Configuration
+```yaml
+# config/development.yaml
+environment: development
+debug: true
+log_level: DEBUG
+
+database:
+  type: sqlite
+  path: data/development.db
+
+apis:
+  rate_limit: 10  # requests per second
+  timeout: 30     # seconds
+
+local_llm:
+  enabled: true
+  model: "llama3.1:8b-instruct-q4_K_M"
+  fallback_to_api: true
+```
+
+### IDE Configuration
+**VS Code Settings**:
+```json
+{
+    "python.defaultInterpreterPath": "./crm_venv/bin/python",
+    "python.testing.pytestEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black",
+    "editor.formatOnSave": true
+}
+```
+
+## Quality Assurance
+
+### Code Quality Metrics
+- **Cyclomatic Complexity**: Maximum 10 per function
+- **Function Length**: Maximum 50 lines
+- **Class Size**: Maximum 500 lines
+- **Test Coverage**: Minimum 80% overall, 95% for critical paths
+
+### Performance Standards
+- **API Response Time**: <2 seconds average
+- **Scraping Rate**: 1 request per second per source
+- **Memory Usage**: <2GB for standard operations
+- **CSV Generation**: <30 seconds for 1000 records
+
+### Security Checklist
+- [ ] API keys stored securely (environment variables/config files)
+- [ ] Input validation on all external data
+- [ ] SQL injection prevention (parameterized queries)
+- [ ] Rate limiting implemented
+- [ ] Error messages don't expose sensitive information
+- [ ] Logging doesn't contain sensitive data
+
+## Documentation Standards
+
+### Code Documentation
+```python
+def classify_industry(company_data: Dict[str, Any]) -> IndustryClassification:
+    """
+    Classify company industry using AI-powered analysis.
+    
+    Args:
+        company_data: Dictionary containing company information
+            - name (str): Company name
+            - description (str): Business description
+            - website (str): Company website URL
+            - location (str): Business address
+    
+    Returns:
+        IndustryClassification: Object containing NAICS code, 
+        category, and confidence score
+        
+    Raises:
+        ClassificationError: When classification fails
+        ValidationError: When input data is invalid
+        
+    Example:
+        >>> data = {"name": "Acme Corp", "description": "Software development"}
+        >>> result = classify_industry(data)
+        >>> print(result.naics_code)
+        541511
+    """
+```
+
+### API Documentation
+- Use OpenAPI/Swagger for REST APIs
+- Include example requests and responses
+- Document error codes and messages
+- Provide authentication examples
+
+### User Documentation
+- Installation and setup instructions
+- Configuration file examples
+- Usage examples with sample data
+- Troubleshooting guide
+- FAQ section
+
+## Monitoring and Debugging
+
+### Development Monitoring
+```python
+# logging configuration
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/app.log'),
+        logging.StreamHandler()
+    ]
+)
+```
+
+### Debug Tools
+- **pdb**: Python debugger for step-through debugging
+- **pytest**: Comprehensive testing framework
+- **coverage**: Code coverage measurement
+- **memory_profiler**: Memory usage analysis
+- **line_profiler**: Performance profiling
+
+### Error Tracking
+- Comprehensive error logging with context
+- Stack trace preservation
+- Error categorization and tagging
+- Automated error alerting for critical issues
+
+## Release Management
+
+### Version Numbering
+Follow Semantic Versioning (SemVer):
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes (backward compatible)
+
+### Release Process
+1. **Pre-release Testing**: Complete regression test suite
+2. **Documentation Update**: Ensure all docs are current
+3. **Change Log**: Document all changes since last release
+4. **Tag Creation**: Create git tag with version number
+5. **Deployment**: Deploy to production environment
+6. **Post-release Validation**: Verify deployment success
+7. **Communication**: Notify stakeholders of release
+
+### Rollback Procedures
+- **Quick Rollback**: Revert to previous version within 5 minutes
+- **Database Migration Rollback**: Separate rollback scripts
+- **Configuration Rollback**: Version-controlled config management
+- **Monitoring**: Immediate post-rollback health checks
+
+

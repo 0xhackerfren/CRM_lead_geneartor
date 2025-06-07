@@ -1,0 +1,5 @@
+company_name,business_address,phone_number,website_url,industry_naics_code,industry_description,business_description,data_quality_score,source_attribution
+Acme Restaurants Co,"123 Main St, New York, NY",(555) 123-4567,https://www.acmerestaurants.com,722511,Full-Service Restaurants,"Professional restaurants services in New York, NY",1.0,yellow_pages
+Best Restaurants Services,"456 Oak Ave, New York, NY",(555) 234-5678,https://www.bestrestaurants.com,722511,Full-Service Restaurants,"Top-rated restaurants provider serving New York, NY",1.0,yellow_pages
+Acme Restaurants Co,"123 Main St, New York, NY",(555) 123-4567,https://www.acmerestaurants.com,722511,Full-Service Restaurants,"Professional restaurants services in New York, NY",1.0,yelp
+Best Restaurants Services,"456 Oak Ave, New York, NY",(555) 234-5678,https://www.bestrestaurants.com,722511,Full-Service Restaurants,"Top-rated restaurants provider serving New York, NY",1.0,yelp

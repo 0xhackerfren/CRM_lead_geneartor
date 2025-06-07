@@ -1,0 +1,272 @@
+# CRM Lead Generation AI Agent - Testing Environment Configuration
+# This configuration is optimized for automated testing and CI/CD
+
+# Application Settings - Testing Mode
+app:
+  name: "CRM Lead Generator (Testing)"
+  version: "1.0.0-test"
+  debug: true
+  log_level: "DEBUG"
+  environment: "testing"
+
+# AI Agent Configuration - Testing Optimized
+agents:
+  primary_framework: "smol_agents"
+  fallback_framework: "langchain"
+  
+  # Hugging Face SmolAgents Configuration - Testing
+  smol_agents:
+    model: "Qwen/Qwen2.5-72B-Instruct"
+    planning_interval: 1    # Fastest planning for tests
+    max_iterations: 3       # Minimal iterations for testing
+    temperature: 0.1
+    max_tokens: 500         # Reduced for fast testing
+    
+  # LangChain Fallback Configuration - Testing
+  langchain:
+    model_name: "microsoft/DialoGPT-medium"
+    memory_type: "conversation_buffer"
+    max_memory_length: 3    # Minimal memory for testing
+    
+  # Tool Configuration - Testing Mode
+  tools:
+    web_scraper:
+      enabled: false        # Disabled - use mocks instead
+      rate_limit: 0.1       # Fast for testing
+      max_retries: 1        # Minimal retries for fast testing
+      timeout: 5            # Short timeout for testing
+    industry_classifier:
+      enabled: true
+      confidence_threshold: 0.5  # Lower threshold for testing
+      use_local_llm: false  # Use mocks for testing
+    data_validator:
+      enabled: true
+      validation_timeout: 2
+
+# Local LLM Configuration - Testing (Disabled)
+local_llm:
+  enabled: false            # Disabled for testing - use mocks
+  platform: "ollama"
+  primary_model: "llama3.1:8b-instruct-q4_K_M"
+  backup_model: "mistral:7b-instruct-q4_K_M"
+  max_response_time: 1.0    # Fast timeout for testing
+  max_retries: 1
+  base_url: "http://localhost:11434"
+  
+# API Fallback Configuration - Testing (All Disabled)
+fallback_apis:
+  openai:
+    enabled: false  # Disabled for testing
+    model: "gpt-4o-mini"
+    max_tokens: 100
+    temperature: 0.1
+  anthropic:
+    enabled: false  # Disabled for testing
+    model: "claude-3-haiku-20240307"
+    max_tokens: 100
+  huggingface:
+    enabled: false  # Disabled for testing
+    model: "microsoft/DialoGPT-medium"
+    max_tokens: 100
+
+# Web Scraping Configuration - Testing (Mock Mode)
+scraping:
+  rate_limit: 0.1       # Fast for testing
+  max_retries: 1        # Minimal retries
+  timeout: 5            # Short timeout
+  respect_robots_txt: false  # Disabled for testing
+  mock_mode: true       # Enable mock responses
+  user_agents:
+    - "TestAgent/1.0 (Testing Environment)"
+  
+# Data Sources Configuration - Testing (Mock Sources)
+data_sources:
+  yellow_pages:
+    enabled: false      # Use mock data instead
+    base_url: "http://localhost:8080/mock/yellowpages"
+    max_results_per_page: 5
+    priority: 1
+  
+  yelp:
+    enabled: false      # Use mock data instead
+    base_url: "http://localhost:8080/mock/yelp"
+    max_results_per_page: 5
+    priority: 2
+  
+  better_business_bureau:
+    enabled: false      # Use mock data instead
+    base_url: "http://localhost:8080/mock/bbb"
+    max_results_per_page: 5
+    priority: 3
+    
+  # Mock data source for testing
+  mock_source:
+    enabled: true
+    sample_data_path: "tests/data/sample_businesses.json"
+    max_results: 10
+
+# Data Processing Configuration - Testing
+processing:
+  batch_size: 5         # Small batches for testing
+  max_workers: 1        # Single worker for testing
+  quality_threshold: 0.3  # Low threshold for testing
+  deduplication:
+    enabled: true
+    similarity_threshold: 0.7
+  validation:
+    phone_validation: false    # Disabled for faster testing
+    email_validation: false    # Disabled for faster testing
+    address_validation: false  # Disabled for faster testing
+    website_validation: false  # Disabled for faster testing
+
+# Output Configuration - Testing
+output:
+  format: "csv"
+  include_metadata: true
+  include_quality_scores: true
+  max_records_per_file: 100   # Small files for testing
+  output_directory: "tests/outputs"
+  filename_template: "test_leads_{timestamp}_{location}.csv"
+  
+  # CSV Field Configuration - Testing (Essential fields only)
+  fields:
+    - "company_name"
+    - "business_address"
+    - "phone_number"
+    - "email_address"
+    - "website_url"
+    - "industry_naics_code"
+    - "data_quality_score"
+    - "source_attribution"
+    - "test_id"
+
+# Geographic Processing - Testing (Simplified)
+geographic:
+  enabled: false        # Disabled for testing
+  geocoding_service: "mock"
+  state_subdivision:
+    enabled: false
+    large_state_threshold: 10
+  regions:
+    test_region: ["TEST"]
+
+# Caching Configuration - Testing (In-Memory)
+cache:
+  enabled: false        # Disabled for testing
+  type: "memory"
+  database_path: ":memory:"
+  expiry_hours: 1       # Short expiry for testing
+  max_size_mb: 10       # Small cache for testing
+
+# Logging Configuration - Testing (Verbose)
+logging:
+  level: "DEBUG"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+  handlers:
+    console:
+      enabled: true
+      level: "DEBUG"
+    file:
+      enabled: true
+      level: "DEBUG"
+      filename: "tests/logs/test_crm_agent.log"
+      max_size_mb: 10
+      backup_count: 1
+  loggers:
+    agents: "DEBUG"
+    scrapers: "DEBUG"
+    processors: "DEBUG"
+    tests: "DEBUG"
+
+# Gradio Frontend Configuration - Testing (Disabled)
+gradio:
+  host: "127.0.0.1"
+  port: 7861            # Different port for testing
+  share: false
+  auth: null
+  theme: "default"
+  title: "CRM Lead Generator (Testing)"
+  description: "Testing environment - do not use for production"
+  enabled: false        # Disabled for automated testing
+  
+# Performance Monitoring - Testing (Minimal)
+monitoring:
+  enabled: false        # Disabled for testing
+  metrics_port: 9092
+  track_response_times: true
+  track_success_rates: true
+  track_resource_usage: false
+
+# Security Configuration - Testing (Relaxed)
+security:
+  api_key_rotation_days: 999  # No rotation during testing
+  encryption:
+    enabled: false      # Disabled for testing
+  access_control:
+    enabled: false      # Disabled for testing
+  audit_logging:
+    enabled: false      # Disabled for testing
+
+# Testing-Specific Settings
+testing:
+  # Test data configuration
+  test_data:
+    enabled: true
+    use_mock_responses: true
+    sample_businesses: 10
+    mock_api_responses: true
+    
+  # Test environment settings
+  environment:
+    isolated: true
+    cleanup_after_tests: true
+    parallel_execution: false
+    timeout_seconds: 30
+    
+  # Mock services
+  mocks:
+    web_scraper: true
+    llm_client: true
+    external_apis: true
+    database: true
+    
+  # Test assertions
+  assertions:
+    strict_validation: true
+    performance_checks: true
+    memory_leak_detection: true
+    
+  # Coverage settings
+  coverage:
+    minimum_percentage: 80
+    fail_under: 75
+    exclude_patterns:
+      - "*/tests/*"
+      - "*/venv/*"
+      - "*/__pycache__/*"
+      
+  # Test databases
+  databases:
+    use_temporary: true
+    cleanup_after_suite: true
+    seed_data: "tests/fixtures/test_data.sql"
+    
+  # Mock data generation
+  mock_data:
+    generate_on_startup: true
+    businesses_count: 50
+    realistic_data: true
+    
+  # Test fixtures
+  fixtures:
+    load_on_startup: true
+    business_data: "tests/fixtures/businesses.json"
+    classification_data: "tests/fixtures/classifications.json"
+    validation_data: "tests/fixtures/validations.json"
+    
+  # Performance testing
+  performance:
+    enabled: false      # Enable for performance tests
+    max_response_time: 1.0
+    max_memory_usage_mb: 512
+    concurrent_requests: 5 

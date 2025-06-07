@@ -1,0 +1,273 @@
+---
+description: Setting up Ollama/local LLMs, implementing AI classification, creating API fallbacks, optimizing LLM performance, managing AI costs
+globs: 
+alwaysApply: false
+---
+# Local LLM Integration Rule
+
+## Overview
+Implement a hybrid AI system that prioritizes local LLM models for privacy, cost-effectiveness, and reliability, with intelligent fallback to cloud APIs when needed. This ensures optimal performance while maintaining data security and cost control.
+
+## Local LLM Strategy
+
+### 1. Primary Local Models
+- **Ollama**: Primary local LLM platform for ease of use
+- **LM Studio**: Alternative local deployment option
+- **llama.cpp**: Lightweight C++ implementation for resource optimization
+- **Text Generation WebUI**: Full-featured local interface
+
+### 2. Model Selection Criteria
+- **Speed**: Response time < 2 seconds for classification tasks
+- **Accuracy**: >85% accuracy on industry classification
+- **Resource Usage**: <8GB RAM for standard models
+- **Model Size**: Prefer 7B-13B parameter models for balance
+
+### 3. Recommended Models
+- **Llama 3.1 8B Instruct**: General purpose, good reasoning
+- **Mistral 7B Instruct**: Efficient, good for classification
+- **Code Llama 7B**: For code generation and analysis
+- **Phi-3 Mini**: Lightweight option for resource constraints
+
+## Implementation Architecture
+
+### LLM Service Layer
+```python
+# Example architecture structure
+class LLMService:
+    def __init__(self):
+        self.local_llm = OllamaClient()
+        self.fallback_apis = [OpenAIClient(), AnthropicClient()]
+        self.model_config = self.load_model_config()
+    
+    async def classify_industry(self, company_data):
+        try:
+            # Try local LLM first
+            return await self.local_llm.classify(company_data)
+        except LocalLLMError:
+            # Fallback to cloud API
+            return await self.fallback_api_classify(company_data)
+```
+
+### Fallback Strategy
+1. **Local LLM Failure**: Network issues, model loading problems
+2. **Performance Threshold**: Response time > 5 seconds
+3. **Quality Threshold**: Confidence score < 70%
+4. **Resource Constraints**: Memory/CPU usage too high
+5. **Batch Processing**: Large datasets requiring parallel processing
+
+### Cloud API Integration
+- **Primary Fallback**: OpenAI GPT-4o-mini (cost-effective)
+- **Secondary Fallback**: Anthropic Claude Haiku (reliability)
+- **Specialized Tasks**: Google Gemini for structured data
+- **Emergency Fallback**: Hugging Face Inference API
+
+## Local LLM Setup
+
+### Ollama Installation
+```bash
+# Windows Installation
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Pull recommended models
+ollama pull llama3.1:8b-instruct-q4_K_M
+ollama pull mistral:7b-instruct-q4_K_M
+ollama pull phi3:mini
+```
+
+### Configuration Management
+```yaml
+# config/llm_config.yaml
+local_llm:
+  platform: "ollama"
+  primary_model: "llama3.1:8b-instruct-q4_K_M"
+  backup_model: "mistral:7b-instruct-q4_K_M"
+  max_response_time: 5.0
+  max_retries: 3
+  
+fallback_apis:
+  openai:
+    model: "gpt-4o-mini"
+    max_tokens: 1000
+    temperature: 0.1
+  anthropic:
+    model: "claude-3-haiku-20240307"
+    max_tokens: 1000
+```
+
+### Resource Management
+- **Memory Monitoring**: Track RAM usage during inference
+- **CPU Utilization**: Monitor processing load
+- **Model Caching**: Keep frequently used models loaded
+- **Batch Optimization**: Group similar requests for efficiency
+
+## Use Cases and Prompting
+
+### Industry Classification
+```python
+INDUSTRY_CLASSIFICATION_PROMPT = """
+Analyze the following company information and classify it according to NAICS codes:
+
+Company: {company_name}
+Description: {company_description}
+Website: {website_content}
+Location: {location}
+
+Please provide:
+1. Primary NAICS code (6-digit)
+2. Industry category
+3. Confidence score (0-100)
+4. Reasoning for classification
+
+Response format: JSON
+"""
+```
+
+### Data Validation
+```python
+DATA_VALIDATION_PROMPT = """
+Validate the following business information for accuracy and completeness:
+
+Business Data: {business_data}
+
+Check for:
+1. Phone number format
+2. Address validity
+3. Website accessibility
+4. Business name consistency
+5. Missing critical information
+
+Provide validation score and recommended corrections.
+"""
+```
+
+### Content Enhancement
+```python
+CONTENT_ENHANCEMENT_PROMPT = """
+Enhance the following business profile with additional relevant information:
+
+Current Profile: {current_profile}
+
+Add:
+1. Business description expansion
+2. Service/product categorization
+3. Target market identification
+4. Competitive positioning
+
+Keep enhancements factual and industry-appropriate.
+"""
+```
+
+## Performance Optimization
+
+### Model Optimization
+- **Quantization**: Use Q4_K_M quantized models for speed
+- **Context Length**: Optimize prompt length for faster responses
+- **Batch Processing**: Group similar requests together
+- **Model Switching**: Use different models for different tasks
+
+### Caching Strategy
+- **Response Caching**: Cache common classification results
+- **Model Caching**: Keep models loaded in memory
+- **Context Caching**: Reuse similar prompts
+- **Result Validation**: Cache validated data
+
+### Monitoring and Metrics
+- **Response Time**: Track local vs API response times
+- **Accuracy Metrics**: Monitor classification accuracy
+- **Cost Analysis**: Compare local vs API costs
+- **Resource Usage**: Monitor system resource consumption
+- **Availability**: Track local LLM uptime
+
+## Error Handling and Resilience
+
+### Local LLM Error Types
+```python
+class LocalLLMError(Exception):
+    """Base exception for local LLM issues"""
+
+class ModelLoadError(LocalLLMError):
+    """Model failed to load"""
+
+class InferenceTimeoutError(LocalLLMError):
+    """Response took too long"""
+
+class ResourceExhaustedError(LocalLLMError):
+    """Insufficient system resources"""
+
+class ModelQualityError(LocalLLMError):
+    """Response quality below threshold"""
+```
+
+### Fallback Decision Logic
+```python
+def should_fallback_to_api(error, context):
+    """Determine if we should use API fallback"""
+    fallback_conditions = [
+        isinstance(error, ModelLoadError),
+        context.response_time > config.MAX_RESPONSE_TIME,
+        context.confidence_score < config.MIN_CONFIDENCE,
+        system_resources_low(),
+        context.is_critical_request
+    ]
+    return any(fallback_conditions)
+```
+
+### Graceful Degradation
+1. **Reduced Functionality**: Simplified responses when resources are limited
+2. **Quality Thresholds**: Accept lower quality for non-critical tasks
+3. **Batch Processing**: Queue requests during high load periods
+4. **Progressive Enhancement**: Start with basic features, add complexity
+
+## Security and Privacy
+
+### Data Protection
+- **Local Processing**: Keep sensitive data on local machine
+- **Encryption**: Encrypt data in transit to APIs
+- **Access Control**: Limit API key access and rotation
+- **Audit Logging**: Track all LLM interactions
+
+### Privacy Considerations
+- **Data Residency**: Process personally identifiable information locally
+- **API Data Policies**: Understand cloud provider data usage
+- **Compliance**: Ensure GDPR/CCPA compliance for data processing
+- **Data Minimization**: Send only necessary data to APIs
+
+## Development Workflow
+
+### Local Development Setup
+1. **Install Ollama**: Setup local LLM platform
+2. **Download Models**: Pull required models for development
+3. **Configuration**: Setup development configuration files
+4. **Testing**: Create test cases for local LLM functionality
+
+### Testing Strategy
+- **Unit Tests**: Test individual LLM service components
+- **Integration Tests**: Test local-to-API fallback scenarios
+- **Performance Tests**: Measure response times and accuracy
+- **Load Tests**: Test system under various load conditions
+
+### Deployment Considerations
+- **Model Distribution**: How to deploy models to production
+- **Resource Allocation**: CPU/GPU requirements for different environments
+- **Monitoring Setup**: Production monitoring and alerting
+- **Backup Strategies**: Ensure API fallbacks are always available
+
+## Cost Analysis
+
+### Local LLM Costs
+- **Hardware**: GPU/CPU requirements and electricity
+- **Maintenance**: Model updates and system maintenance
+- **Development**: Time investment for setup and optimization
+
+### API Costs
+- **Per-Request Pricing**: Calculate costs based on usage patterns
+- **Rate Limiting**: Understand API limits and overage charges
+- **Model Selection**: Choose cost-effective models for each use case
+
+### Cost Optimization
+- **Hybrid Usage**: Optimize local vs API usage based on cost/performance
+- **Batch Processing**: Reduce API calls through intelligent batching
+- **Caching**: Reduce redundant processing through effective caching
+- **Model Selection**: Use appropriate model size for each task
+
+

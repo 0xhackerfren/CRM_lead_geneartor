@@ -1,0 +1,247 @@
+# CRM Lead Generation AI Agent Configuration
+# This file contains all configuration settings for the application
+
+app:
+  name: "CRM Lead Generator"
+  version: "1.0.0"
+  debug: true
+  log_level: "INFO"
+
+# AI Agent Configuration
+agents:
+  primary_framework: "smol_agents"
+  fallback_framework: "langchain"
+  
+  # Hugging Face SmolAgents Configuration
+  smol_agents:
+    model: "Qwen/Qwen2.5-72B-Instruct"  # As per documentation
+    planning_interval: 3
+    max_iterations: 10
+    temperature: 0.1
+    max_tokens: 2000
+    
+  # LangChain Fallback Configuration
+  langchain:
+    model_name: "microsoft/DialoGPT-medium"
+    memory_type: "conversation_buffer"
+    max_memory_length: 10
+    
+  # Tool Configuration
+  tools:
+    web_scraper:
+      enabled: true
+      rate_limit: 1.0  # seconds between requests
+      max_retries: 3
+      timeout: 30
+    industry_classifier:
+      enabled: true
+      confidence_threshold: 0.7
+      use_local_llm: true
+    data_validator:
+      enabled: true
+      validation_timeout: 10
+
+# Local LLM Configuration
+local_llm:
+  enabled: true
+  platform: "ollama"
+  primary_model: "llama3.1:8b-instruct-q4_K_M"
+  backup_model: "mistral:7b-instruct-q4_K_M"
+  max_response_time: 5.0
+  max_retries: 3
+  base_url: "http://localhost:11434"
+  
+# API Fallback Configuration
+fallback_apis:
+  openai:
+    enabled: false  # Set to true and add API key in .env
+    model: "gpt-4o-mini"
+    max_tokens: 1000
+    temperature: 0.1
+  anthropic:
+    enabled: false  # Set to true and add API key in .env
+    model: "claude-3-haiku-20240307"
+    max_tokens: 1000
+  huggingface:
+    enabled: true
+    model: "microsoft/DialoGPT-medium"
+    max_tokens: 1000
+
+# Web Scraping Configuration
+scraping:
+  rate_limit: 2.0  # seconds between requests
+  max_retries: 3
+  timeout: 30
+  respect_robots_txt: true
+  user_agents:
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    - "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  
+# Data Sources Configuration
+data_sources:
+  yellow_pages:
+    enabled: true
+    base_url: "https://www.yellowpages.com"
+    max_results_per_page: 30
+    priority: 1
+  
+  yelp:
+    enabled: true
+    base_url: "https://www.yelp.com"
+    max_results_per_page: 20
+    priority: 2
+  
+  better_business_bureau:
+    enabled: false  # Requires special handling
+    base_url: "https://www.bbb.org"
+    max_results_per_page: 25
+    priority: 3
+
+# Data Processing Configuration
+processing:
+  batch_size: 50
+  max_workers: 4
+  quality_threshold: 0.7
+  deduplication:
+    enabled: true
+    similarity_threshold: 0.85
+  validation:
+    phone_validation: true
+    email_validation: true
+    address_validation: true
+    website_validation: true
+
+# Output Configuration
+output:
+  format: "csv"
+  include_metadata: true
+  include_quality_scores: true
+  max_records_per_file: 10000
+  output_directory: "data/outputs"
+  filename_template: "leads_{timestamp}_{location}.csv"
+  
+  # CSV Field Configuration
+  fields:
+    - "company_name"
+    - "business_address"
+    - "phone_number"
+    - "email_address"
+    - "website_url"
+    - "industry_naics_code"
+    - "industry_description"
+    - "business_description"
+    - "data_quality_score"
+    - "source_attribution"
+    - "classification_confidence"
+    - "validation_status"
+    - "last_updated"
+
+# Geographic Processing
+geographic:
+  enabled: true
+  geocoding_service: "nominatim"  # free service
+  state_subdivision:
+    enabled: true
+    large_state_threshold: 1000  # number of businesses
+  regions:
+    west_coast: ["CA", "OR", "WA"]
+    southeast: ["FL", "GA", "SC", "NC", "VA"]
+    northeast: ["NY", "NJ", "PA", "CT", "MA", "RI", "VT", "NH", "ME"]
+    midwest: ["IL", "IN", "MI", "OH", "WI", "IA", "KS", "MN", "MO", "NE", "ND", "SD"]
+
+# Caching Configuration
+cache:
+  enabled: true
+  type: "sqlite"
+  database_path: "data/cache/crm_cache.db"
+  expiry_hours: 24
+  max_size_mb: 500
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+    file:
+      enabled: true
+      level: "DEBUG"
+      filename: "logs/crm_agent.log"
+      max_size_mb: 100
+      backup_count: 5
+  loggers:
+    agents: "DEBUG"
+    scrapers: "INFO"
+    processors: "INFO"
+
+# Gradio Frontend Configuration
+gradio:
+  host: "127.0.0.1"
+  port: 7860
+  share: false
+  auth: null  # Set to ["username", "password"] for authentication
+  theme: "default"
+  title: "CRM Lead Generation AI Agent"
+  description: "Generate high-quality business leads using AI agents"
+  
+# Performance Monitoring
+monitoring:
+  enabled: true
+  metrics_port: 9090
+  track_response_times: true
+  track_success_rates: true
+  track_resource_usage: true
+
+# Security Configuration
+security:
+  api_key_rotation_days: 30
+  max_requests_per_minute: 60
+  data_encryption: true
+  audit_logging: true
+
+# Performance Configuration
+performance:
+  max_concurrent_tasks: 5
+  task_timeout: 300  # seconds
+  memory_limit: "4GB"
+  
+  # Caching
+  caching:
+    enabled: true
+    ttl: 3600  # seconds
+    max_size: 1000  # items
+
+# Error Handling Configuration
+error_handling:
+  max_retries: 3
+  retry_delay: 1.0  # seconds
+  exponential_backoff: true
+  
+  # Circuit breaker
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 5
+    timeout: 60  # seconds
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  
+  # Metrics to track
+  metrics:
+    - "tasks_completed"
+    - "tasks_failed"
+    - "average_execution_time"
+    - "data_quality_scores"
+    - "classification_accuracy"
+  
+  # Health checks
+  health_checks:
+    interval: 300  # seconds
+    endpoints:
+      - "local_llm"
+      - "web_scraping"
+      - "data_validation" 

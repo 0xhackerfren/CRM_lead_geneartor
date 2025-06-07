@@ -1,0 +1,120 @@
+---
+description: Writing/updating requirements, defining acceptance criteria, managing requirement changes, tracing features to requirements
+globs: 
+alwaysApply: false
+---
+# Requirements Management Rule
+
+## Overview
+Maintain a centralized [Requirements.md](mdc:Requirements.md) document that serves as the single source of truth for all application requirements, specifications, and acceptance criteria.
+
+## Requirements Document Structure
+
+### 1. Executive Summary
+- Project purpose and business objectives
+- Target users and use cases
+- Success metrics and KPIs
+
+### 2. Functional Requirements
+- **Core Features**: Lead generation, data collection, CSV export
+- **Data Processing**: Classification, validation, enrichment
+- **Geographic Handling**: Multi-state processing, intelligent subdivision
+- **Integration Requirements**: CRM systems, APIs, databases
+
+### 3. Technical Requirements
+- **Performance**: Processing speed, scalability limits
+- **Reliability**: Uptime, error handling, recovery
+- **Security**: Data protection, API key management
+- **Compatibility**: Python versions, dependencies
+
+### 4. Data Requirements
+- **Input Sources**: Business directories, government databases, social media
+- **Output Format**: CSV structure, field definitions
+- **Quality Standards**: Accuracy thresholds, validation rules
+- **Compliance**: GDPR, data usage policies
+
+### 5. User Interface Requirements
+- **Command Line Interface**: Parameters, help system
+- **Configuration**: Config files, environment variables
+- **Monitoring**: Progress tracking, logging output
+
+### 6. Integration Requirements
+- **AI Models**: Local LLM setup, API fallbacks
+- **External APIs**: Rate limiting, authentication
+- **File System**: Directory structure, naming conventions
+
+## Requirements Lifecycle
+
+### Creation Phase
+1. **Stakeholder Input**: Gather requirements from all sources
+2. **Documentation**: Write clear, testable requirements
+3. **Review**: Validate completeness and feasibility
+4. **Approval**: Get sign-off before development
+
+### Maintenance Phase
+1. **Change Requests**: Document all requirement changes
+2. **Impact Analysis**: Assess changes on existing code
+3. **Version Control**: Track requirement evolution
+4. **Traceability**: Map requirements to implementation
+
+### Validation Phase
+1. **Acceptance Criteria**: Define testable conditions
+2. **Test Cases**: Create validation procedures
+3. **User Acceptance**: Verify requirements are met
+4. **Documentation Update**: Keep requirements current
+
+## Implementation Guidelines
+
+### Requirement Format
+```markdown
+**REQ-001: Geographic Processing**
+- Description: System must process leads by state/region
+- Priority: High
+- Acceptance Criteria:
+  - [ ] Process individual states (e.g., "California")
+  - [ ] Handle multi-state queries (e.g., "West Coast")
+  - [ ] Intelligent subdivision for large states
+- Dependencies: Geographic data source integration
+- Estimated Effort: 2-3 sprints
+```
+
+### Traceability Matrix
+- Map each requirement to development tasks
+- Link requirements to test cases
+- Track implementation status
+- Monitor requirement coverage
+
+### Change Management
+1. **Change Request Process**: Formal procedure for modifications
+2. **Impact Assessment**: Analyze effect on timeline/budget
+3. **Approval Workflow**: Stakeholder sign-off required
+4. **Implementation Tracking**: Monitor change execution
+
+## Best Practices
+
+### Writing Requirements
+- Use clear, unambiguous language
+- Make requirements testable and measurable
+- Include acceptance criteria for each requirement
+- Prioritize using MoSCoW method (Must, Should, Could, Won't)
+
+### Requirement Types
+- **Functional**: What the system must do
+- **Non-Functional**: How the system must perform
+- **Business**: Why the system is needed
+- **Technical**: Implementation constraints
+
+### Documentation Standards
+- Use consistent formatting and terminology
+- Include diagrams and examples where helpful
+- Maintain version history and change log
+- Regular reviews and updates
+
+## Tools and Templates
+- **Requirements Template**: Standardized format
+- **Change Request Form**: Structured change process
+- **Traceability Matrix**: Requirement-to-implementation mapping
+- **Review Checklist**: Quality assurance process
+
+
+

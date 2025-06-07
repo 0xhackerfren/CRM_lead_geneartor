@@ -1,0 +1,160 @@
+---
+description: Legal compliance, rate limiting, and ethical web scraping implementation for data collection
+globs: 
+alwaysApply: false
+---
+# Web Scraping Guidelines
+
+## Legal Compliance
+
+### Robots.txt Compliance
+- **Always Check**: Parse and respect robots.txt files
+- **User-Agent Compliance**: Use appropriate user-agent strings
+- **Crawl-Delay**: Respect crawl-delay directives
+- **Disallow Rules**: Never scrape disallowed paths
+
+```python
+import robotparser
+
+def check_robots_permission(url, user_agent='*'):
+    rp = robotparser.RobotFileParser()
+    rp.set_url(f"{url}/robots.txt")
+    rp.read()
+    return rp.can_fetch(user_agent, url)
+```
+
+### Terms of Service
+- **Review ToS**: Check website terms of service before scraping
+- **API First**: Use official APIs when available
+- **Fair Use**: Limit requests to publicly available information
+- **No Personal Data**: Avoid scraping personal/private information
+
+## Rate Limiting Rules
+
+### Request Throttling
+- **Base Delay**: 1-2 seconds between requests to same domain
+- **Adaptive Throttling**: Increase delay if server responds slowly
+- **No DOS**: Never exceed 10 requests per second to any domain
+- **Respect Server Load**: Back off during high server load
+
+```python
+import time
+import random
+
+class RateLimiter:
+    def __init__(self, min_delay=1.0, max_delay=2.0):
+        self.min_delay = min_delay
+        self.max_delay = max_delay
+        self.last_request = {}
+    
+    def wait(self, domain):
+        now = time.time()
+        if domain in self.last_request:
+            elapsed = now - self.last_request[domain]
+            delay = random.uniform(self.min_delay, self.max_delay)
+            if elapsed < delay:
+                time.sleep(delay - elapsed)
+        self.last_request[domain] = time.time()
+```
+
+### Error Handling
+- **HTTP Status Codes**: Handle 429 (Too Many Requests) gracefully
+- **Exponential Backoff**: Increase delay after consecutive failures
+- **Circuit Breaker**: Stop requests to consistently failing domains
+- **Retry Limits**: Maximum 3 retries per request
+
+## Technical Implementation
+
+### Headers and User Agents
+```python
+HEADERS = {
+    'User-Agent': 'CRM Lead Generator Bot 1.0 (Contact: your-email@domain.com)',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.5',
+    'Accept-Encoding': 'gzip, deflate',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+}
+```
+
+### Session Management
+- **Persistent Sessions**: Reuse connections with requests.Session()
+- **Cookie Handling**: Maintain cookies for session continuity
+- **Connection Pooling**: Use connection pools for efficiency
+- **Timeout Settings**: Set reasonable request timeouts (30 seconds)
+
+### Content Parsing
+- **BeautifulSoup**: Primary HTML parsing library
+- **XPath Support**: Use lxml for complex element selection
+- **Error Handling**: Graceful handling of malformed HTML
+- **Encoding Detection**: Proper character encoding handling
+
+```python
+import requests
+from bs4 import BeautifulSoup
+import chardet
+
+def safe_parse_html(content):
+    encoding = chardet.detect(content)['encoding']
+    if encoding:
+        content = content.decode(encoding)
+    return BeautifulSoup(content, 'html.parser')
+```
+
+## Data Source Specific Rules
+
+### Business Directories
+- **Yellow Pages**: 2-second delay, respect pagination limits
+- **Yelp**: Use official API when possible, respect rate limits
+- **Google Business**: Use Google My Business API, not direct scraping
+- **BBB**: 3-second delay, limited to business listings only
+
+### Government Sources
+- **SEC EDGAR**: Use official API, respect 10 requests per second limit
+- **State Registrations**: Check individual state policies
+- **Public Records**: Ensure data is truly public before scraping
+- **Federal APIs**: Use official government APIs when available
+
+### Social Media
+- **LinkedIn**: Use official LinkedIn API only, no direct scraping
+- **Facebook**: Use Graph API for business pages
+- **Twitter**: Use official Twitter API v2
+- **Instagram**: Use Instagram Basic Display API
+
+## Monitoring and Logging
+
+### Request Logging
+```python
+import logging
+
+def log_request(url, status_code, response_time):
+    logging.info(f"Scraped {url} - Status: {status_code} - Time: {response_time}ms")
+```
+
+### Performance Metrics
+- **Success Rate**: Track percentage of successful requests
+- **Response Times**: Monitor average response times per domain
+- **Error Types**: Categorize and count different error types
+- **Data Quality**: Track completeness of extracted data
+
+### Alerting
+- **High Error Rates**: Alert when error rate exceeds 10%
+- **Slow Responses**: Alert when average response time > 10 seconds
+- **IP Blocking**: Detect and alert on potential IP blocking
+- **Quota Limits**: Monitor API quota usage for rate-limited services
+
+## Proxy and IP Management
+
+### Proxy Rotation
+- **Optional Feature**: Implement proxy rotation for large-scale operations
+- **Quality Proxies**: Use reputable proxy services only
+- **Proxy Health**: Monitor proxy performance and availability
+- **Geographic Distribution**: Use proxies from appropriate regions
+
+### IP Management
+- **IP Reputation**: Monitor IP reputation to avoid blacklisting
+- **Backup IPs**: Have backup IP addresses available
+- **ISP Communication**: Coordinate with ISP for legitimate business use
+- **Whitelist Requests**: Request whitelisting for legitimate scraping
+
+

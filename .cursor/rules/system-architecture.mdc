@@ -1,0 +1,163 @@
+---
+description: Modular design patterns, directory structure, and code organization for scalable CRM system
+globs: 
+alwaysApply: false
+---
+# System Architecture Rules
+
+## Project Structure
+
+### Directory Organization
+```
+/src
+  /agents              # AI agent implementations
+    /__init__.py
+    /search_agent.py   # Web search and discovery
+    /classify_agent.py # Industry classification
+    /validate_agent.py # Data validation
+    /extract_agent.py  # Information extraction
+  /scrapers            # Web scraping modules
+    /__init__.py
+    /base_scraper.py   # Abstract base scraper class
+    /directory_scrapers.py # Business directory scrapers
+    /government_scrapers.py # Government database scrapers
+    /social_scrapers.py # Social media scrapers
+  /processors          # Data processing and validation
+    /__init__.py
+    /data_cleaner.py   # Data cleaning and standardization
+    /validator.py      # Data validation logic
+    /classifier.py     # Industry classification
+    /geocoder.py       # Geographic processing
+  /outputs             # CSV generation and formatting
+    /__init__.py
+    /csv_generator.py  # CSV file creation
+    /formatter.py      # Data formatting utilities
+    /reporter.py       # Summary report generation
+  /config              # Configuration management
+    /__init__.py
+    /settings.py       # Application settings
+    /sources.py        # Data source configurations
+    /constants.py      # System constants
+  /utils               # Utility functions
+    /__init__.py
+    /helpers.py        # General helper functions
+    /logging_config.py # Logging configuration
+    /rate_limiter.py   # Request rate limiting
+/data
+  /raw                 # Raw scraped data
+  /processed           # Cleaned and validated data
+  /outputs             # Final CSV files
+  /cache               # Cached data and models
+/logs                  # Application logs
+/tests                 # Unit and integration tests
+/config                # Configuration files
+  /config.yaml         # Main configuration
+  /sources.yaml        # Data source settings
+  /logging.yaml        # Logging configuration
+```
+
+## Modular Design Principles
+
+### Core Components
+1. **Agent Layer**: AI-powered decision making and orchestration
+2. **Scraper Layer**: Data collection from various sources
+3. **Processor Layer**: Data cleaning, validation, and transformation
+4. **Output Layer**: Formatted data generation and reporting
+
+### Interface Contracts
+```python
+# Base interfaces for consistent implementation
+class BaseAgent(ABC):
+    @abstractmethod
+    def process(self, task: Task) -> Result:
+        pass
+
+class BaseScraper(ABC):
+    @abstractmethod
+    def scrape(self, query: Query) -> RawData:
+        pass
+
+class BaseProcessor(ABC):
+    @abstractmethod
+    def process(self, raw_data: RawData) -> ProcessedData:
+        pass
+```
+
+### Dependency Injection
+- Use dependency injection for loose coupling
+- Implement factory patterns for component creation
+- Enable easy testing with mock objects
+
+## Data Flow Architecture
+
+### Pipeline Design
+1. **Input Processing**: User prompt → structured query
+2. **Search Phase**: Query → raw web data
+3. **Extraction Phase**: Raw data → structured information
+4. **Validation Phase**: Structured data → verified data
+5. **Output Phase**: Verified data → CSV files
+
+### State Management
+- **Immutable Data**: Use immutable data structures where possible
+- **State Persistence**: Save intermediate results for resume capability
+- **Transaction Logs**: Track all operations for debugging
+
+## Configuration Management
+
+### Hierarchical Configuration
+1. **Default Settings**: Built-in defaults in code
+2. **Configuration Files**: YAML/JSON configuration files
+3. **Environment Variables**: Override settings via environment
+4. **Runtime Parameters**: Command-line argument overrides
+
+### Configuration Schema
+```yaml
+# config.yaml structure
+app:
+  name: "CRM Lead Generator"
+  version: "1.0.0"
+  
+scraping:
+  rate_limit: 2.0  # seconds between requests
+  max_retries: 3
+  timeout: 30
+  
+agents:
+  primary_framework: "smol_agents"
+  fallback_framework: "langchain"
+  model_cache_dir: "./models"
+  
+output:
+  format: "csv"
+  include_metadata: true
+  quality_threshold: 0.7
+```
+
+## Error Handling Architecture
+
+### Exception Hierarchy
+```python
+class CRMException(Exception):
+    """Base exception for CRM application"""
+    pass
+
+class ScrapingException(CRMException):
+    """Exceptions related to web scraping"""
+    pass
+
+class ValidationException(CRMException):
+    """Exceptions related to data validation"""
+    pass
+
+class AgentException(CRMException):
+    """Exceptions related to AI agents"""
+    pass
+```
+
+### Recovery Strategies
+- **Graceful Degradation**: Reduce functionality rather than fail completely
+- **Circuit Breaker**: Stop making requests to failing services
+- **Retry with Backoff**: Exponential backoff for transient failures
+- **Checkpoint System**: Resume from last successful state
+
+

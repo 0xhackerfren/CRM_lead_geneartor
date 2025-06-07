@@ -1,0 +1,174 @@
+---
+description: Overall project requirements and architecture for CRM lead generation AI agent system
+globs: 
+alwaysApply: false
+---
+# CRM Lead Generation AI Agent Rules
+
+## Project Overview
+This project creates an AI agent for comprehensive CRM lead generation that researches and compiles company information within specific industries through extensive web crawling and data aggregation.
+
+## Core Architecture Requirements
+
+### AI Agent Framework
+- **Primary**: Use Hugging Face Smol Agents as the main AI agent framework
+- **Fallback**: Implement LangChain as backup/alternative framework
+- **Integration**: Design modular architecture to switch between frameworks seamlessly
+- **Models**: Leverage Hugging Face transformers and models for natural language processing
+
+### Geographic Processing
+- **Scope**: Support all 50 US states
+- **Intelligence**: Agent should intelligently break down geographic areas specified in user prompts
+- **Granularity**: Automatically determine reasonable geographic subdivision (state → county → city as needed)
+- **Flexibility**: Allow user to specify geographic scope in natural language
+
+### Industry Classification System
+- **Multi-Method Approach**: Implement flexible industry identification using:
+  - NAICS code matching when available
+  - Keyword-based classification
+  - AI-powered industry categorization
+  - Business description analysis
+- **Confidence Scoring**: Assign confidence levels to industry classifications
+- **Manual Override**: Allow manual industry assignment when automated methods fail
+
+## Data Collection Strategy
+
+### Data Sources (Comprehensive)
+Implement scrapers and API integrations for:
+- **Business Directories**: Yellow Pages, Yelp, Google Business, BBB
+- **Government Sources**: SEC filings, state business registrations, EDGAR database
+- **Professional Networks**: LinkedIn company profiles
+- **Company Websites**: Direct scraping of company information
+- **Industry Databases**: Industry-specific directories and databases
+- **News Sources**: Press releases, news articles for company updates
+- **Social Media**: Facebook business pages, Twitter profiles
+- **Domain/WHOIS**: Domain registration information
+
+### Web Scraping Guidelines
+- **Rate Limiting**: Implement 1-2 second delays between requests to prevent ISP throttling
+- **Legal Compliance**: Respect robots.txt, implement proper user agents
+- **No DOS**: Never exceed 10 requests per second to any single domain
+- **Error Handling**: Implement exponential backoff for failed requests
+- **Proxy Support**: Optional proxy rotation for large-scale operations
+
+## Output Specifications
+
+### CSV Structure
+Generate state-specific CSV files with comprehensive company data:
+
+#### Required Fields
+- Company Name
+- Industry Classification
+- CEO/President Name
+- Business Address (Street, City, State, ZIP)
+- Phone Number(s)
+- Email Address(es)
+- Website URL
+- Company Size (Employee Count)
+- Annual Revenue (if available)
+- Founded Date
+- Business Description
+
+#### Extended CRM Fields
+- **Contact Information**: Key personnel beyond CEO (CTO, Sales Director, etc.)
+- **Financial Data**: Revenue range, funding information, public/private status
+- **Social Media**: LinkedIn, Twitter, Facebook profiles
+- **Technology Stack**: Known technologies used (for tech companies)
+- **Recent News**: Latest press releases or news mentions
+- **Competitive Intelligence**: Main competitors, market position
+- **Sales Intelligence**: Decision makers, procurement processes
+- **Geographic Coverage**: Service areas, locations served
+
+#### Data Quality Fields
+- **Source Confidence**: Score 1-10 for data reliability
+- **Last Updated**: Timestamp of data collection
+- **Data Sources**: List of sources used for each field
+- **Verification Status**: Manually verified, auto-verified, or unverified
+- **Missing Data Flags**: Mark unknown fields as "UNKNOWN" or "NOT_FOUND"
+
+## Data Validation System
+
+### Multi-Source Verification
+- **Cross-Reference**: Validate data across minimum 3 sources when possible
+- **Confidence Scoring**: Assign confidence levels (1-10) to each data point
+- **Conflict Resolution**: Implement rules for handling conflicting information
+- **Manual Review Flags**: Flag entries requiring human verification
+
+### Quality Assurance
+- **Duplicate Detection**: Identify and merge duplicate company entries
+- **Format Standardization**: Standardize phone numbers, addresses, company names
+- **Completeness Scoring**: Rate how complete each company profile is
+- **Accuracy Validation**: Implement basic validation (valid phone formats, email formats, etc.)
+
+## Operational Framework
+
+### Execution Model
+- **On-Demand**: Run when manually triggered (quarterly basis)
+- **Batch Processing**: Process entire industries/states in batches
+- **Resume Capability**: Ability to resume interrupted scraping sessions
+- **Progress Tracking**: Real-time progress reporting and logging
+
+### Performance Requirements
+- **Scalability**: Handle 10,000+ companies per industry/state
+- **Memory Management**: Efficient memory usage for large datasets
+- **Storage**: Organized file structure for outputs and logs
+- **Monitoring**: Track success rates, errors, and performance metrics
+
+## Technical Implementation Guidelines
+
+### Code Architecture
+- **Modular Design**: Separate modules for scraping, processing, validation, output
+- **Configuration**: External config files for sources, rate limits, output formats
+- **Logging**: Comprehensive logging for debugging and monitoring
+- **Error Recovery**: Robust error handling with retry mechanisms
+
+### Dependencies Management
+- **Core Libraries**: requests, beautifulsoup4, pandas, transformers
+- **Agent Frameworks**: smol-agents, langchain
+- **Data Processing**: numpy, scipy for data analysis
+- **Validation**: validators, phonenumbers for data validation
+
+### File Structure
+```
+/src
+  /agents          # AI agent implementations
+  /scrapers        # Web scraping modules
+  /processors      # Data processing and validation
+  /outputs         # CSV generation and formatting
+  /config          # Configuration files
+  /utils           # Utility functions
+/data
+  /raw             # Raw scraped data
+  /processed       # Cleaned and validated data
+  /outputs         # Final CSV files
+/logs              # Application logs
+```
+
+## Usage Guidelines
+
+### Input Format
+- Accept natural language prompts like: "Find all ISP companies in North Carolina"
+- Parse industry keywords and geographic specifications
+- Handle variations in industry terminology
+
+### Output Organization
+- **File Naming**: `{Industry}_{State}_{Date}.csv`
+- **Directory Structure**: Organize by date and industry
+- **Metadata Files**: Include summary statistics and collection metadata
+
+### Error Handling
+- **Graceful Degradation**: Continue processing when individual sources fail
+- **User Feedback**: Provide clear status updates and error messages
+- **Recovery Options**: Ability to restart from last successful checkpoint
+
+## Development Priorities
+
+1. **MVP Features**: Basic scraping, CSV output, single industry/state
+2. **Core Intelligence**: AI-powered industry classification and data validation
+3. **Scale Features**: Multi-state processing, comprehensive data sources
+4. **Advanced Features**: Real-time monitoring, advanced validation, API integration
+
+This rule set should guide the development of a robust, scalable CRM lead generation system that meets all specified requirements while maintaining legal compliance and operational efficiency.
+
+
+

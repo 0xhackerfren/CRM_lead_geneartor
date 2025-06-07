@@ -1,0 +1,157 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Directory Tree Management and Project Structure Awareness
+
+## Purpose
+This rule ensures AI agents maintain complete awareness of the project's directory structure and prevent duplicate file/directory creation through systematic directory tree management.
+
+## Core Requirements
+
+### 1. Directory Tree Discovery and Maintenance
+- **ALWAYS** start any development task by running `list_dir` on the root directory to get current project structure
+- **BEFORE** creating any new file or directory, verify it doesn't already exist using appropriate search tools
+- Maintain an up-to-date mental model of the complete project structure throughout the session
+- Use `file_search` to locate existing files when uncertain about their location
+
+### 2. Pre-Creation Verification Protocol
+Before creating any new file or directory, the AI agent **MUST**:
+1. Run `list_dir` on the target directory to see existing contents
+2. Use `file_search` with the proposed filename to check for existing files
+3. Use `grep_search` to search for similar functionality in existing files
+4. Only proceed with creation if no conflicts or duplicates are found
+
+### 3. Project Structure Awareness Commands
+Use these tools in the following order for comprehensive structure awareness:
+
+```powershell
+# Initial project discovery
+list_dir "."
+
+# Check specific directories before modification  
+list_dir "src"
+list_dir "config" 
+list_dir "data"
+
+# Search for existing files before creating new ones
+file_search "filename_pattern"
+grep_search "function_or_class_name"
+```
+
+### 4. Directory Structure Documentation
+Maintain awareness of the standard project structure:
+
+```
+CRM_lead_geneartor/
+├── .cursor/rules/           # Cursor rule files (.mdc)
+├── config/                  # Configuration files
+├── data/                    # Data storage
+│   └── outputs/            # Generated output files
+├── src/                    # Source code
+│   ├── agents/             # AI agent implementations  
+│   ├── config/             # Configuration modules
+│   ├── processors/         # Data processing modules
+│   ├── scrapers/           # Web scraping modules
+│   ├── tools/              # Utility tools
+│   └── utils/              # Helper utilities
+├── devtasks.md             # Development task tracking
+├── Requirements.md         # Project requirements
+├── requirements.txt        # Python dependencies
+└── README.md              # Project documentation
+```
+
+### 5. Conflict Prevention Rules
+
+#### File Creation Rules
+- **NEVER** create a file without first checking if it exists
+- If a similar file exists, either modify the existing file or use a clearly differentiated name
+- When adding functionality, check if it already exists in another module
+- Always use `codebase_search` to find existing implementations before creating new ones
+
+#### Directory Creation Rules  
+- **NEVER** create a directory without verifying the target location is appropriate
+- Check if similar directories already exist that could serve the same purpose
+- Follow the established directory naming conventions
+- Respect the modular architecture defined in [System Architecture](mdc:.cursor/rules/system-architecture.mdc)
+
+### 6. Required Verification Workflow
+
+For **EVERY** development task, follow this workflow:
+
+1. **Project Structure Check**
+   ```
+   list_dir "."
+   list_dir "src"
+   ```
+
+2. **Existing File Search**
+   ```
+   file_search "proposed_filename"
+   codebase_search "similar functionality"
+   ```
+
+3. **Conflict Analysis**
+   - Review search results for potential conflicts
+   - Identify existing files that serve similar purposes
+   - Determine if modification vs. creation is appropriate
+
+4. **Proceed with Creation/Modification**
+   - Only after verification shows no conflicts
+   - Document the decision-making process
+   - Update relevant documentation if needed
+
+### 7. Integration with Existing Rules
+
+This rule works in conjunction with:
+- [System Architecture](mdc:.cursor/rules/system-architecture.mdc) - for proper module placement
+- [File Organization](mdc:.cursor/rules/file-organization.mdc) - for naming conventions
+- [Development Task Management](mdc:.cursor/rules/development-task-management.mdc) - for task tracking
+- [Code Standards](mdc:.cursor/rules/code-standards.mdc) - for code organization
+
+### 8. Error Prevention Measures
+
+#### Common Mistakes to Avoid
+- Creating duplicate utility functions in different modules
+- Adding new scrapers without checking existing scraper directory
+- Creating config files that duplicate existing configuration
+- Implementing processors that replicate existing functionality
+
+#### Verification Commands Before Any Creation
+```powershell
+# Check if file exists anywhere in project
+file_search "filename"
+
+# Check if functionality exists
+codebase_search "function_name or description"
+grep_search "class_name or method_name"
+
+# Verify directory structure
+list_dir "target_directory"
+```
+
+### 9. Documentation Updates
+When creating new files or directories:
+- Update [devtasks.md](mdc:devtasks.md) with the addition
+- Ensure [README.md](mdc:README.md) reflects structural changes
+- Update relevant documentation in other rule files
+
+### 10. Enforcement Protocol
+- This rule takes **PRECEDENCE** over feature implementation speed
+- Any violation (creating duplicate files/directories) requires immediate remediation
+- Always err on the side of over-verification rather than risk duplicates
+
+## Success Criteria
+- Zero duplicate files or directories created during development
+- Complete awareness of project structure maintained throughout sessions
+- Efficient reuse of existing components instead of recreation
+- Clear documentation of all structural changes
+
+## Failure Recovery
+If duplicate creation occurs:
+1. Immediately identify and remove the duplicate
+2. Consolidate functionality into the appropriate existing file
+3. Update all references and imports
+4. Document the consolidation in commit messages
+

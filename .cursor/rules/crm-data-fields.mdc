@@ -1,0 +1,182 @@
+---
+description: Defining comprehensive data fields and output formats for CRM lead generation CSV files
+globs: 
+alwaysApply: false
+---
+# CRM Data Fields Specification
+
+## Core Company Information
+
+### Basic Company Data
+- **company_name**: Official legal company name
+- **dba_name**: "Doing Business As" name if different from legal name
+- **company_type**: Corporation, LLC, Partnership, Sole Proprietorship
+- **industry_primary**: Primary industry classification (NAICS code preferred)
+- **industry_secondary**: Secondary industry classifications
+- **business_description**: Brief description of company's business
+- **founded_date**: Company founding date (YYYY-MM-DD format)
+- **company_size**: Employee count range (1-10, 11-50, 51-200, 201-500, 500+)
+- **annual_revenue**: Revenue range or specific amount if public
+- **public_private**: Public company, Private company, Non-profit
+- **parent_company**: Parent company name if subsidiary
+
+### Contact Information
+- **headquarters_address**: Primary business address
+- **headquarters_city**: City of headquarters
+- **headquarters_state**: State/province of headquarters
+- **headquarters_zip**: ZIP/postal code
+- **headquarters_country**: Country (default: USA)
+- **mailing_address**: Mailing address if different from headquarters
+- **phone_main**: Main company phone number
+- **phone_toll_free**: Toll-free number if available
+- **fax_number**: Fax number if available
+- **email_general**: General company email address
+- **website_url**: Primary company website
+- **linkedin_company**: LinkedIn company page URL
+
+## Executive Leadership
+
+### Key Personnel
+- **ceo_name**: Chief Executive Officer name
+- **ceo_email**: CEO email address if available
+- **ceo_linkedin**: CEO LinkedIn profile URL
+- **president_name**: President name (if different from CEO)
+- **cfo_name**: Chief Financial Officer name
+- **cto_name**: Chief Technology Officer name
+- **sales_director**: Sales Director/VP Sales name
+- **marketing_director**: Marketing Director/VP Marketing name
+- **hr_director**: Human Resources Director name
+
+### Contact Hierarchy
+- **decision_makers**: List of key decision makers
+- **procurement_contact**: Procurement/purchasing contact
+- **it_contact**: IT decision maker contact
+- **finance_contact**: Finance decision maker contact
+
+## Business Intelligence
+
+### Market Position
+- **market_position**: Market leader, challenger, follower, niche
+- **main_competitors**: List of primary competitors
+- **competitive_advantages**: Unique selling propositions
+- **market_share**: Market share percentage if available
+- **geographic_coverage**: Areas/regions served
+- **customer_base**: Target customer demographics
+- **revenue_growth**: Recent revenue growth trends
+
+### Financial Information
+- **stock_ticker**: Stock ticker symbol if public
+- **stock_exchange**: Exchange where stock is traded
+- **market_cap**: Market capitalization if public
+- **last_funding_round**: Most recent funding information
+- **funding_total**: Total funding raised
+- **investors**: Key investors or investment firms
+- **credit_rating**: Business credit rating if available
+- **annual_report_url**: Link to latest annual report
+
+## Operational Details
+
+### Business Operations
+- **business_hours**: Standard operating hours
+- **time_zone**: Primary time zone
+- **languages_supported**: Languages for business communication
+- **certifications**: Relevant business certifications
+- **licenses**: Business licenses and permits
+- **insurance_coverage**: Types of business insurance
+- **union_status**: Union or non-union workforce
+
+### Technology Stack
+- **primary_software**: Main software platforms used
+- **crm_system**: Current CRM system in use
+- **erp_system**: ERP system if applicable
+- **cloud_provider**: Primary cloud service provider
+- **tech_stack**: Development/technology stack
+- **it_infrastructure**: On-premise, cloud, or hybrid
+
+## Sales Intelligence
+
+### Sales Readiness
+- **buying_cycle**: Typical buying cycle length
+- **budget_range**: Typical project budget ranges
+- **fiscal_year_end**: Fiscal year ending month
+- **procurement_process**: Procurement/purchasing process
+- **vendor_requirements**: Requirements for new vendors
+- **current_vendors**: Known current vendor relationships
+
+### Engagement History
+- **last_contact_date**: Date of last sales contact
+- **contact_method**: Method of last contact
+- **sales_stage**: Current stage in sales pipeline
+- **interest_level**: Level of interest in products/services
+- **pain_points**: Known business challenges
+- **solution_fit**: How well solutions align with needs
+
+## Data Quality Metadata
+
+### Source Information
+- **data_source**: Primary source of information
+- **data_sources_all**: All sources used for this record
+- **collection_date**: Date when data was collected
+- **last_updated**: Last date information was updated
+- **update_frequency**: How often data should be refreshed
+- **data_collector**: Agent/system that collected the data
+
+### Quality Indicators
+- **completeness_score**: Percentage of fields populated (0-100)
+- **confidence_score**: Overall confidence in data accuracy (1-10)
+- **verification_status**: verified, unverified, needs_verification
+- **accuracy_flags**: Flags for potential data quality issues
+- **duplicate_risk**: Risk of being duplicate record (low/medium/high)
+- **manual_review**: Requires manual review (true/false)
+
+### Field-Level Quality
+```csv
+# Example quality tracking per field
+field_name,confidence_score,source,last_verified,status
+company_name,10,official_website,2024-01-15,verified
+ceo_name,7,linkedin,2024-01-15,unverified
+phone_main,9,yellow_pages,2024-01-15,verified
+revenue,3,estimate,2024-01-15,estimated
+```
+
+## Special Indicators
+
+### Lead Scoring
+- **lead_score**: Overall lead score (1-100)
+- **buying_intent**: Indicators of buying intent
+- **timing_indicators**: Signals of purchase timing
+- **budget_indicators**: Signs of available budget
+- **authority_level**: Decision-making authority level
+- **need_urgency**: Urgency of business need
+
+### Compliance and Risk
+- **compliance_requirements**: Regulatory compliance needs
+- **risk_factors**: Potential business risks
+- **security_requirements**: Security and privacy requirements
+- **contract_preferences**: Preferred contract terms
+- **payment_terms**: Standard payment terms
+- **legal_issues**: Any known legal issues
+
+## Output Format Standards
+
+### Missing Data Handling
+- Use "UNKNOWN" for missing required fields
+- Use "NOT_FOUND" for searched but unavailable data
+- Use "NOT_APPLICABLE" for fields that don't apply
+- Use null/empty for optional fields with no data
+
+### Data Standardization
+- **Phone Numbers**: Format as (XXX) XXX-XXXX
+- **Addresses**: Use USPS standard formatting
+- **Dates**: Use YYYY-MM-DD format
+- **URLs**: Include https:// prefix
+- **Names**: Use proper case formatting
+- **States**: Use two-letter abbreviations
+
+### Quality Thresholds
+- **Minimum Completeness**: 60% of core fields populated
+- **Minimum Confidence**: Overall confidence score ≥ 6
+- **Required Fields**: company_name, industry, location (city/state)
+- **High-Value Fields**: CEO name, phone, email, website, revenue
+
+

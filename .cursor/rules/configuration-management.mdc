@@ -1,0 +1,390 @@
+---
+description: Setting up external config files, environment variables, and hierarchical configuration systems
+globs: 
+alwaysApply: false
+---
+# Configuration Management Rules
+
+## Hierarchical Configuration System
+
+### Configuration File Structure
+Following [HuggingFace best practices](mdc:https:/huggingface.co/docs/smolagents/tutorials/building_good_agents):
+
+```yaml
+# config/config.yaml - Main configuration file
+app:
+  name: "CRM Lead Generator"
+  version: "1.0.0"
+  environment: "development"  # development, staging, production
+
+# Agent configuration following smolagents documentation patterns  
+agents:
+  primary_framework: "smolagents"  # As per HF documentation
+  fallback_framework: "langchain"
+  model_config:
+    primary_model: "Qwen/Qwen2.5-72B-Instruct"  # Recommended in documentation
+    temperature: 0.7
+    max_tokens: 2048
+    planning_interval: 3  # From building good agents guide
+  model_cache_dir: "./models"
+
+# Web scraping configuration following compliance rules
+scraping:
+  rate_limit:
+    min_delay: 1.0
+    max_delay: 2.0
+    max_concurrent: 5
+  compliance:
+    respect_robots_txt: true
+    user_agent: "CRM Lead Generator Bot 1.0 (Contact: your-email@domain.com)"
+    timeout: 30
+  retry_config:
+    max_retries: 3
+    backoff_factor: 2
+
+# Data quality thresholds from validation rules
+quality:
+  minimum_completeness: 60
+  minimum_confidence: 6
+  required_fields: ["company_name", "industry", "city", "state"]
+  
+# Output configuration
+output:
+  format: "csv"
+  include_metadata: true
+  organize_by_geography: true
+  
+# External API configurations
+apis:
+  huggingface:
+    token_env_var: "HF_TOKEN"
+    inference_endpoint: "https://api-inference.huggingface.co"
+  data_sources:
+    sec_edgar_api: "https://data.sec.gov/api"
+    usps_api: "https://tools.usps.com/go/ZipLookupAction"
+```
+
+### Environment-Specific Configurations
+```yaml
+# config/environments/development.yaml
+scraping:
+  rate_limit:
+    min_delay: 2.0  # Slower in development
+    max_delay: 4.0
+  
+# config/environments/production.yaml  
+scraping:
+  rate_limit:
+    min_delay: 1.0  # Optimized for production
+    max_delay: 2.0
+    
+logging:
+  level: "INFO"  # Less verbose in production
+```
+
+## Environment Variable Management
+
+### Required Environment Variables
+```bash
+# .env file template
+# HuggingFace Configuration (Required for smolagents)
+HF_TOKEN=your_huggingface_token_here
+
+# Database Configuration (if using)
+DATABASE_URL=postgresql://user:pass@localhost/crm_leads
+
+# API Keys for Data Sources
+GOOGLE_API_KEY=your_google_api_key
+YELP_API_KEY=your_yelp_api_key
+
+# Email Configuration (for notifications)
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@domain.com
+SMTP_PASSWORD=your_app_password
+
+# Security Configuration
+SECRET_KEY=your_secret_key_here
+ENCRYPTION_KEY=your_encryption_key_here
+```
+
+### Environment Variable Loading
+```python
+# Following HuggingFace security best practices
+import os
+from dotenv import load_dotenv
+
+def load_environment():
+    """
+    Load environment variables following HF documentation patterns
+    """
+    load_dotenv()  # Load from .env file
+    
+    # Validate required environment variables
+    required_vars = [
+        'HF_TOKEN',  # Required for smolagents
+    ]
+    
+    missing_vars = []
+    for var in required_vars:
+        if not os.getenv(var):
+            missing_vars.append(var)
+    
+    if missing_vars:
+        raise EnvironmentError(f"Missing required environment variables: {missing_vars}")
+    
+    return {
+        'hf_token': os.getenv('HF_TOKEN'),
+        'database_url': os.getenv('DATABASE_URL'),
+        'api_keys': {
+            'google': os.getenv('GOOGLE_API_KEY'),
+            'yelp': os.getenv('YELP_API_KEY')
+        }
+    }
+```
+
+## Configuration Loading System
+
+### Configuration Class
+```python
+import yaml
+import os
+from pathlib import Path
+from typing import Dict, Any
+
+class ConfigManager:
+    """
+    Configuration manager following HuggingFace patterns
+    """
+    
+    def __init__(self, config_dir: str = "config"):
+        self.config_dir = Path(config_dir)
+        self.env = os.getenv("ENVIRONMENT", "development")
+        self.config = self._load_configuration()
+    
+    def _load_configuration(self) -> Dict[str, Any]:
+        """
+        Load hierarchical configuration following best practices
+        """
+        # 1. Load base configuration
+        base_config_path = self.config_dir / "config.yaml"
+        with open(base_config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        
+        # 2. Load environment-specific overrides
+        env_config_path = self.config_dir / "environments" / f"{self.env}.yaml"
+        if env_config_path.exists():
+            with open(env_config_path, 'r') as f:
+                env_config = yaml.safe_load(f)
+                config = self._merge_configs(config, env_config)
+        
+        # 3. Apply environment variable overrides
+        config = self._apply_env_overrides(config)
+        
+        return config
+    
+    def get_agent_config(self) -> Dict[str, Any]:
+        """
+        Get agent configuration for smolagents initialization
+        """
+        return {
+            'model_id': self.config['agents']['model_config']['primary_model'],
+            'temperature': self.config['agents']['model_config']['temperature'],
+            'max_tokens': self.config['agents']['model_config']['max_tokens'],
+            'planning_interval': self.config['agents']['model_config']['planning_interval'],
+            'token': os.getenv('HF_TOKEN')
+        }
+    
+    def get_scraping_config(self) -> Dict[str, Any]:
+        """
+        Get web scraping configuration
+        """
+        return self.config['scraping']
+```
+
+## Data Source Configuration
+
+### Source-Specific Settings
+```yaml
+# config/data_sources.yaml
+data_sources:
+  yellow_pages:
+    base_url: "https://www.yellowpages.com"
+    rate_limit: 2.0  # Seconds between requests
+    retry_attempts: 3
+    required_fields: ["name", "phone", "address"]
+    
+  better_business_bureau:
+    base_url: "https://www.bbb.org"
+    rate_limit: 3.0  # More conservative for BBB
+    retry_attempts: 2
+    
+  sec_edgar:
+    base_url: "https://data.sec.gov"
+    rate_limit: 0.1  # SEC allows 10 requests per second
+    api_key_required: false
+    user_agent_required: true
+    
+  linkedin:
+    api_version: "v2"
+    rate_limit: 1.0
+    api_key_required: true
+    requires_oauth: true
+```
+
+### Dynamic Configuration Updates
+```python
+class DynamicConfig:
+    """
+    Support for runtime configuration updates
+    """
+    
+    def update_rate_limits(self, source: str, new_limit: float):
+        """
+        Dynamically adjust rate limits based on server responses
+        """
+        if source in self.config['data_sources']:
+            old_limit = self.config['data_sources'][source]['rate_limit']
+            self.config['data_sources'][source]['rate_limit'] = new_limit
+            
+            self.logger.info(f"Updated {source} rate limit: {old_limit} -> {new_limit}")
+    
+    def handle_rate_limit_response(self, source: str, response_code: int):
+        """
+        Auto-adjust configuration based on HTTP responses
+        """
+        if response_code == 429:  # Too Many Requests
+            current_limit = self.config['data_sources'][source]['rate_limit']
+            new_limit = current_limit * 1.5  # Increase delay by 50%
+            self.update_rate_limits(source, new_limit)
+```
+
+## Model Configuration
+
+### HuggingFace Model Setup
+```python
+from smolagents import HfApiModel
+
+def create_model_from_config(config: ConfigManager) -> HfApiModel:
+    """
+    Create HuggingFace model following documentation patterns
+    """
+    agent_config = config.get_agent_config()
+    
+    # Following smolagents documentation for model initialization
+    model = HfApiModel(
+        model_id=agent_config['model_id'],
+        token=agent_config['token'],
+        temperature=agent_config['temperature'],
+        max_tokens=agent_config['max_tokens']
+    )
+    
+    return model
+```
+
+### Model Fallback Configuration
+```yaml
+# Model fallback strategy from AI agent framework rules
+model_fallback:
+  primary: "Qwen/Qwen2.5-72B-Instruct"
+  fallback_options:
+    - "microsoft/DialoGPT-medium"
+    - "distilbert-base-uncased"
+  auto_fallback: true
+  fallback_triggers:
+    - "rate_limit_exceeded"
+    - "model_unavailable" 
+    - "context_length_exceeded"
+```
+
+## Logging Configuration
+
+### Structured Logging Setup
+```yaml
+# config/logging.yaml
+logging:
+  version: 1
+  disable_existing_loggers: false
+  
+  formatters:
+    standard:
+      format: '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+    detailed:
+      format: '%(asctime)s [%(levelname)s] %(name)s:%(lineno)d: %(message)s'
+      
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: standard
+      stream: ext://sys.stdout
+      
+    file:
+      class: logging.handlers.RotatingFileHandler
+      level: DEBUG
+      formatter: detailed
+      filename: logs/crm_agent.log
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+      
+  loggers:
+    smolagents:
+      level: INFO
+      handlers: [console, file]
+      propagate: false
+      
+    crm_agent:
+      level: DEBUG
+      handlers: [console, file]
+      propagate: false
+      
+  root:
+    level: WARNING
+    handlers: [console]
+```
+
+## Configuration Validation
+
+### Schema Validation
+```python
+from cerberus import Validator
+
+CONFIG_SCHEMA = {
+    'app': {
+        'type': 'dict',
+        'required': True,
+        'schema': {
+            'name': {'type': 'string', 'required': True},
+            'version': {'type': 'string', 'required': True}
+        }
+    },
+    'agents': {
+        'type': 'dict',
+        'required': True,
+        'schema': {
+            'primary_framework': {'type': 'string', 'allowed': ['smolagents', 'langchain']},
+            'model_config': {
+                'type': 'dict',
+                'schema': {
+                    'primary_model': {'type': 'string', 'required': True},
+                    'temperature': {'type': 'float', 'min': 0, 'max': 2},
+                    'planning_interval': {'type': 'integer', 'min': 1, 'max': 10}
+                }
+            }
+        }
+    }
+}
+
+def validate_configuration(config: dict) -> bool:
+    """
+    Validate configuration against schema
+    """
+    validator = Validator(CONFIG_SCHEMA)
+    is_valid = validator.validate(config)
+    
+    if not is_valid:
+        raise ValueError(f"Configuration validation failed: {validator.errors}")
+    
+    return is_valid
+```
+

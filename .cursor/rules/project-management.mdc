@@ -1,0 +1,363 @@
+---
+description: Planning sprints, tracking milestones, managing risks, reporting progress, conducting retrospectives, stakeholder communication
+globs: 
+alwaysApply: false
+---
+# Project Management Rule
+
+## Overview
+Establish comprehensive project management practices to ensure successful delivery of the CRM Lead Generation system through structured planning, progress tracking, risk management, and stakeholder communication.
+
+## Project Documentation Structure
+
+### Core Documents
+- **[Requirements.md](mdc:Requirements.md)**: Single source of truth for all requirements
+- **[devtasks.md](mdc:devtasks.md)**: Detailed task breakdown and progress tracking
+- **[architecture.md](mdc:architecture.md)**: System architecture and design decisions
+- **[deployment.md](mdc:deployment.md)**: Deployment procedures and environment setup
+- **[user-guide.md](mdc:user-guide.md)**: End-user documentation and tutorials
+
+### Progress Tracking Documents
+- **[milestone-tracker.md](mdc:milestone-tracker.md)**: High-level milestone progress
+- **[sprint-reports.md](mdc:sprint-reports.md)**: Weekly progress and blockers
+- **[risk-register.md](mdc:risk-register.md)**: Risk identification and mitigation
+- **[decision-log.md](mdc:decision-log.md)**: Important project decisions and rationale
+
+### Quality Assurance Documents
+- **[test-plans.md](mdc:test-plans.md)**: Testing strategy and test cases
+- **[bug-tracker.md](mdc:bug-tracker.md)**: Bug reports and resolution status
+- **[performance-metrics.md](mdc:performance-metrics.md)**: Performance benchmarks and monitoring
+
+## Milestone Management
+
+### Project Phases and Milestones
+
+#### Phase 1: Foundation (Weeks 1-2)
+**Milestone 1.1: Project Setup Complete**
+- [x] Development environment configured
+- [x] Git repository initialized with branching strategy
+- [x] Basic project structure created
+- [x] Initial requirements documented
+- **Due Date**: End of Week 1
+- **Success Criteria**: Team can contribute code and run tests
+
+**Milestone 1.2: Basic Scraping Infrastructure**
+- [ ] Web scraper framework implemented
+- [ ] Rate limiting and error handling
+- [ ] Configuration management system
+- [ ] Basic logging and monitoring
+- **Due Date**: End of Week 2
+- **Success Criteria**: Can scrape sample data from one source
+
+#### Phase 2: Core Features (Weeks 3-6)
+**Milestone 2.1: AI Integration Complete**
+- [ ] Local LLM setup and configuration
+- [ ] Industry classification system
+- [ ] API fallback mechanism
+- [ ] Performance optimization
+- **Due Date**: End of Week 4
+- **Success Criteria**: Accurate industry classification with <2s response time
+
+**Milestone 2.2: Data Processing Pipeline**
+- [ ] Data validation and cleaning
+- [ ] Quality scoring system
+- [ ] Duplicate detection and removal
+- [ ] CSV output generation
+- **Due Date**: End of Week 6
+- **Success Criteria**: Generate clean, validated lead lists
+
+#### Phase 3: Advanced Features (Weeks 7-10)
+**Milestone 3.1: Multi-Source Integration**
+- [ ] Multiple data source scrapers
+- [ ] Data source prioritization
+- [ ] Cross-source validation
+- [ ] Unified data model
+- **Due Date**: End of Week 8
+- **Success Criteria**: Collect data from 3+ sources reliably
+
+**Milestone 3.2: Geographic Processing**
+- [ ] State-based processing
+- [ ] Multi-state query handling
+- [ ] Geographic data enrichment
+- [ ] Location-based filtering
+- **Due Date**: End of Week 10
+- **Success Criteria**: Process leads by geographic region
+
+#### Phase 4: Production Ready (Weeks 11-12)
+**Milestone 4.1: Performance and Monitoring**
+- [ ] Performance optimization complete
+- [ ] Comprehensive monitoring system
+- [ ] Error alerting and recovery
+- [ ] Load testing completed
+- **Due Date**: End of Week 11
+- **Success Criteria**: Handle production loads reliably
+
+**Milestone 4.2: Deployment and Documentation**
+- [ ] Production deployment procedures
+- [ ] User documentation complete
+- [ ] Training materials created
+- [ ] Support procedures established
+- **Due Date**: End of Week 12
+- **Success Criteria**: System ready for production use
+
+### Milestone Tracking Format
+```markdown
+## Milestone: [M-X.Y] Milestone Name
+**Phase**: X | **Status**: 🟡 In Progress | **Due**: YYYY-MM-DD
+**Owner**: [Team Member] | **Priority**: High
+
+### Description
+Brief description of the milestone and its importance to the project.
+
+### Success Criteria
+- [ ] Specific, measurable criterion 1
+- [ ] Specific, measurable criterion 2
+- [ ] Specific, measurable criterion 3
+
+### Dependencies
+- Milestone M-X.Y must be complete
+- External dependency (e.g., API access)
+
+### Risks and Mitigation
+- **Risk**: Description of potential issue
+- **Impact**: High/Medium/Low
+- **Mitigation**: Strategy to address the risk
+
+### Progress Updates
+**YYYY-MM-DD**: Current status update and any blockers
+**YYYY-MM-DD**: Previous update
+```
+
+## Sprint Management
+
+### Sprint Structure
+- **Duration**: 1 week sprints
+- **Planning**: Monday morning (1 hour)
+- **Daily Standups**: Tuesday-Friday (15 minutes)
+- **Review/Retrospective**: Friday afternoon (1 hour)
+
+### Sprint Planning Process
+1. **Review Previous Sprint**: Completion rate, blockers, lessons learned
+2. **Priority Assessment**: Review [devtasks.md](mdc:devtasks.md) for current priorities
+3. **Capacity Planning**: Estimate available development time
+4. **Task Selection**: Choose tasks that fit capacity and dependencies
+5. **Sprint Goal**: Define clear objective for the sprint
+
+### Sprint Report Template
+```markdown
+## Sprint Report: Week of YYYY-MM-DD
+
+### Sprint Goal
+Clear statement of what we aimed to accomplish this sprint.
+
+### Completed Tasks
+- [TASK-XXX] Task description (Effort: X hours)
+- [TASK-YYY] Task description (Effort: Y hours)
+
+### In Progress Tasks
+- [TASK-ZZZ] Task description (X% complete, blocker: description)
+
+### Blocked Tasks
+- [TASK-AAA] Task description (Blocker: dependency/decision needed)
+
+### Metrics
+- **Planned Capacity**: X hours
+- **Actual Hours Worked**: Y hours
+- **Tasks Completed**: A of B planned
+- **Story Points Completed**: X of Y planned
+
+### Blockers and Issues
+1. **Blocker**: Description of issue
+   - **Impact**: How it affects progress
+   - **Action**: Steps being taken to resolve
+
+### Next Sprint Planning
+- **Focus Areas**: What to prioritize next week
+- **Dependencies**: What needs to be resolved
+- **Risks**: Potential issues to watch
+```
+
+## Risk Management
+
+### Risk Categories
+1. **Technical Risks**: Technology challenges, integration issues
+2. **Resource Risks**: Time constraints, skill gaps
+3. **External Risks**: API changes, data source availability
+4. **Quality Risks**: Performance, reliability, security issues
+
+### Risk Assessment Matrix
+| Probability | Impact | Risk Level |
+|-------------|--------|------------|
+| High | High | 🔴 Critical |
+| High | Medium | 🟠 High |
+| Medium | High | 🟠 High |
+| Medium | Medium | 🟡 Medium |
+| Low | High | 🟡 Medium |
+| Low | Medium | 🟢 Low |
+
+### Risk Register Format
+```markdown
+## Risk: [R-XXX] Risk Title
+**Category**: Technical | **Status**: Active | **Owner**: [Name]
+**Probability**: High/Medium/Low | **Impact**: High/Medium/Low
+**Risk Level**: 🔴/🟠/🟡/🟢
+
+### Description
+Detailed description of the risk and potential consequences.
+
+### Impact Assessment
+- **Timeline Impact**: Potential delay in days/weeks
+- **Quality Impact**: How it might affect system quality
+- **Cost Impact**: Additional resources or expenses needed
+
+### Mitigation Strategy
+- **Prevention**: Steps to prevent the risk from occurring
+- **Response**: Actions to take if the risk materializes
+- **Contingency**: Backup plans and alternatives
+
+### Status Updates
+**YYYY-MM-DD**: Current status and any changes to assessment
+```
+
+## Communication Protocols
+
+### Stakeholder Communication
+- **Weekly Status Reports**: Email summary to stakeholders
+- **Monthly Demos**: Show progress and get feedback
+- **Milestone Reviews**: Formal review at each milestone
+- **Issue Escalation**: Process for raising critical issues
+
+### Team Communication
+- **Daily Standups**: Progress, plans, blockers
+- **Weekly Planning**: Sprint planning and retrospectives
+- **Ad-hoc Discussions**: Slack/Teams for quick questions
+- **Decision Documentation**: Log important decisions
+
+### Status Report Template
+```markdown
+# CRM Lead Generation - Weekly Status Report
+**Week Ending**: YYYY-MM-DD | **Project Manager**: [Name]
+
+## Executive Summary
+High-level overview of progress, key accomplishments, and next steps.
+
+## Progress This Week
+### Completed Milestones
+- [M-X.Y] Milestone name - completed on schedule
+
+### Tasks Completed
+- [TASK-XXX] Task description
+- [TASK-YYY] Task description
+
+### Key Accomplishments
+- Major feature completed
+- Important integration working
+- Performance milestone achieved
+
+## Challenges and Blockers
+### Current Issues
+1. **Issue**: Description
+   - **Impact**: How it affects timeline/quality
+   - **Action**: Steps being taken
+
+### Resolved Issues
+- **Issue**: What was resolved and how
+
+## Next Week Focus
+- Primary objectives for next week
+- Key deliverables and deadlines
+- Dependencies that need attention
+
+## Metrics Dashboard
+- **Overall Progress**: X% complete
+- **Current Sprint**: Y% complete
+- **Budget Status**: On track / Over / Under
+- **Quality Metrics**: Test coverage, bug count, etc.
+
+## Risks and Mitigation
+- **New Risks**: Any new risks identified
+- **Risk Status**: Updates on existing risks
+- **Mitigation Actions**: Steps taken this week
+```
+
+## Quality Management
+
+### Definition of Done
+For each task/story to be considered complete:
+- [ ] Code implementation matches requirements
+- [ ] Unit tests written and passing (>80% coverage)
+- [ ] Integration tests pass
+- [ ] Code review completed and approved
+- [ ] Documentation updated
+- [ ] Manual testing completed
+- [ ] Performance requirements met
+- [ ] Security review completed (if applicable)
+
+### Quality Gates
+- **Code Quality**: Automated linting and style checks
+- **Test Coverage**: Minimum thresholds enforced
+- **Performance**: Response time and resource usage limits
+- **Security**: Vulnerability scanning and secure coding practices
+
+### Continuous Improvement
+- **Sprint Retrospectives**: What went well, what can improve
+- **Process Refinement**: Regular review of workflows and tools
+- **Skill Development**: Training and knowledge sharing
+- **Tool Evaluation**: Assess and adopt better development tools
+
+## Change Management
+
+### Change Request Process
+1. **Identification**: Stakeholder identifies need for change
+2. **Documentation**: Complete change request form
+3. **Impact Analysis**: Assess effect on timeline, budget, quality
+4. **Approval**: Stakeholder and project team sign-off
+5. **Implementation**: Update plans and communicate changes
+6. **Validation**: Ensure change meets requirements
+
+### Change Request Template
+```markdown
+## Change Request: [CR-XXX] Change Title
+**Requestor**: [Name] | **Date**: YYYY-MM-DD | **Priority**: High/Medium/Low
+
+### Current State
+Description of how things work currently.
+
+### Proposed Change
+Detailed description of the requested change.
+
+### Business Justification
+Why this change is needed and what value it provides.
+
+### Impact Analysis
+- **Timeline Impact**: Effect on project schedule
+- **Resource Impact**: Additional effort required
+- **Technical Impact**: Changes to architecture/design
+- **Risk Impact**: New risks introduced
+
+### Implementation Plan
+High-level plan for implementing the change.
+
+### Approval
+- [ ] Technical Lead Approval
+- [ ] Project Manager Approval
+- [ ] Stakeholder Approval
+```
+
+## Success Metrics
+
+### Project Success Criteria
+- **On-Time Delivery**: Deliver within planned timeline
+- **Quality Standards**: Meet all defined quality gates
+- **Functional Requirements**: All must-have features implemented
+- **Performance Goals**: Meet response time and throughput targets
+- **Stakeholder Satisfaction**: Positive feedback from end users
+
+### Key Performance Indicators
+- **Development Velocity**: Story points completed per sprint
+- **Code Quality**: Test coverage, bug density, code review time
+- **System Performance**: Response times, throughput, error rates
+- **User Adoption**: Usage metrics after deployment
+- **Maintenance Burden**: Time spent on bug fixes vs new features
+
+

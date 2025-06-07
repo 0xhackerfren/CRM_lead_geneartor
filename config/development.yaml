@@ -1,0 +1,217 @@
+# CRM Lead Generation AI Agent - Development Environment Configuration
+# This configuration is optimized for development work
+
+# Application Settings - Development Mode
+app:
+  name: "CRM Lead Generator (Development)"
+  version: "1.0.0-dev"
+  debug: true
+  log_level: "DEBUG"
+  environment: "development"
+
+# AI Agent Configuration - Development Optimized
+agents:
+  primary_framework: "smol_agents"
+  fallback_framework: "langchain"
+  
+  # Hugging Face SmolAgents Configuration
+  smol_agents:
+    model: "Qwen/Qwen2.5-72B-Instruct"
+    planning_interval: 2  # Faster planning for development
+    max_iterations: 5     # Reduced for faster testing
+    temperature: 0.1
+    max_tokens: 1000      # Reduced for faster responses
+    
+  # LangChain Fallback Configuration
+  langchain:
+    model_name: "microsoft/DialoGPT-medium"
+    memory_type: "conversation_buffer"
+    max_memory_length: 5  # Reduced for development
+    
+  # Tool Configuration - Development Mode
+  tools:
+    web_scraper:
+      enabled: true
+      rate_limit: 0.5     # Faster scraping for development
+      max_retries: 2      # Fewer retries for faster feedback
+      timeout: 15         # Shorter timeout for development
+    industry_classifier:
+      enabled: true
+      confidence_threshold: 0.6  # Lower threshold for testing
+      use_local_llm: true
+    data_validator:
+      enabled: true
+      validation_timeout: 5
+
+# Local LLM Configuration - Development
+local_llm:
+  enabled: true
+  platform: "ollama"
+  primary_model: "llama3.1:8b-instruct-q4_K_M"
+  backup_model: "mistral:7b-instruct-q4_K_M"
+  max_response_time: 3.0    # Faster timeout for development
+  max_retries: 2
+  base_url: "http://localhost:11434"
+  
+# API Fallback Configuration - Development
+fallback_apis:
+  openai:
+    enabled: false  # Keep disabled for development cost control
+    model: "gpt-4o-mini"
+    max_tokens: 500
+    temperature: 0.1
+  anthropic:
+    enabled: false  # Keep disabled for development cost control
+    model: "claude-3-haiku-20240307"
+    max_tokens: 500
+  huggingface:
+    enabled: true
+    model: "microsoft/DialoGPT-medium"
+    max_tokens: 500
+
+# Web Scraping Configuration - Development Optimized
+scraping:
+  rate_limit: 1.0       # Faster for development testing
+  max_retries: 2        # Fewer retries for faster feedback
+  timeout: 15           # Shorter timeout
+  respect_robots_txt: true
+  user_agents:
+    - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+  
+# Data Sources Configuration - Development Limited
+data_sources:
+  yellow_pages:
+    enabled: true
+    base_url: "https://www.yellowpages.com"
+    max_results_per_page: 10  # Reduced for faster development testing
+    priority: 1
+  
+  yelp:
+    enabled: true
+    base_url: "https://www.yelp.com"
+    max_results_per_page: 10  # Reduced for development
+    priority: 2
+  
+  better_business_bureau:
+    enabled: false
+    base_url: "https://www.bbb.org"
+    max_results_per_page: 10
+    priority: 3
+
+# Data Processing Configuration - Development
+processing:
+  batch_size: 10        # Smaller batches for development
+  max_workers: 2        # Fewer workers for development
+  quality_threshold: 0.5  # Lower threshold for testing
+  deduplication:
+    enabled: true
+    similarity_threshold: 0.8
+  validation:
+    phone_validation: true
+    email_validation: true
+    address_validation: false  # Disabled for faster development
+    website_validation: true
+
+# Output Configuration - Development
+output:
+  format: "csv"
+  include_metadata: true
+  include_quality_scores: true
+  max_records_per_file: 1000  # Smaller files for development
+  output_directory: "data/outputs/dev"
+  filename_template: "dev_leads_{timestamp}_{location}.csv"
+  
+  # CSV Field Configuration - Full fields for development testing
+  fields:
+    - "company_name"
+    - "business_address"
+    - "phone_number"
+    - "email_address"
+    - "website_url"
+    - "industry_naics_code"
+    - "industry_description"
+    - "business_description"
+    - "data_quality_score"
+    - "source_attribution"
+    - "classification_confidence"
+    - "validation_status"
+    - "last_updated"
+
+# Geographic Processing - Development
+geographic:
+  enabled: true
+  geocoding_service: "nominatim"
+  state_subdivision:
+    enabled: false      # Disabled for faster development
+    large_state_threshold: 100
+  regions:
+    test_region: ["NC", "SC"]  # Limited regions for development
+
+# Caching Configuration - Development
+cache:
+  enabled: true
+  type: "sqlite"
+  database_path: "data/cache/dev_crm_cache.db"
+  expiry_hours: 4       # Shorter expiry for development
+  max_size_mb: 100      # Smaller cache for development
+
+# Logging Configuration - Development (Verbose)
+logging:
+  level: "DEBUG"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+  handlers:
+    console:
+      enabled: true
+      level: "DEBUG"
+    file:
+      enabled: true
+      level: "DEBUG"
+      filename: "logs/dev_crm_agent.log"
+      max_size_mb: 50
+      backup_count: 3
+  loggers:
+    agents: "DEBUG"
+    scrapers: "DEBUG"
+    processors: "DEBUG"
+
+# Gradio Frontend Configuration - Development
+gradio:
+  host: "127.0.0.1"
+  port: 7860
+  share: false
+  auth: null
+  theme: "default"
+  title: "CRM Lead Generator (Development)"
+  description: "Development environment for CRM lead generation AI agent"
+  
+# Performance Monitoring - Development (Simplified)
+monitoring:
+  enabled: true
+  metrics_port: 9091
+  track_response_times: true
+  track_success_rates: true
+  track_resource_usage: false  # Disabled for development
+
+# Security Configuration - Development (Relaxed)
+security:
+  api_key_rotation_days: 90  # Longer rotation for development
+  
+# Development-Specific Settings
+development:
+  # Test data settings
+  test_data:
+    enabled: true
+    sample_size: 10
+    mock_responses: true
+  
+  # Development tools
+  tools:
+    hot_reload: true
+    debug_mode: true
+    mock_external_apis: false
+    
+  # Development limits
+  limits:
+    max_test_requests: 100
+    daily_scraping_limit: 1000
+    max_concurrent_tasks: 2 

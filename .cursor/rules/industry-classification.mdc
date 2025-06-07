@@ -1,0 +1,296 @@
+---
+description: Classifying companies into industries using NAICS codes, keywords, and AI-powered categorization
+globs: 
+alwaysApply: false
+---
+ # Industry Classification Rules
+
+## Multi-Method Classification Approach
+
+### Primary Classification Methods
+1. **NAICS Code Matching**: Use official North American Industry Classification System
+2. **Keyword-Based Classification**: Pattern matching on business descriptions
+3. **AI-Powered Categorization**: Machine learning classification using business context
+4. **Manual Override**: Human verification and correction capability
+
+### Classification Hierarchy
+```python
+CLASSIFICATION_PRIORITY = [
+    'official_naics',      # Official NAICS code from government sources
+    'self_reported_naics', # NAICS code from company website/filings
+    'ai_classification',   # AI-powered classification
+    'keyword_matching',    # Rule-based keyword classification
+    'directory_category',  # Category from business directories
+    'manual_assignment'    # Human-assigned classification
+]
+```
+
+## NAICS Code System
+
+### NAICS Code Integration
+```python
+NAICS_CODES = {
+    '11': 'Agriculture, Forestry, Fishing and Hunting',
+    '21': 'Mining, Quarrying, and Oil and Gas Extraction',
+    '22': 'Utilities',
+    '23': 'Construction',
+    '31-33': 'Manufacturing',
+    '42': 'Wholesale Trade',
+    '44-45': 'Retail Trade',
+    '48-49': 'Transportation and Warehousing',
+    '51': 'Information',
+    '52': 'Finance and Insurance',
+    '53': 'Real Estate and Rental and Leasing',
+    '54': 'Professional, Scientific, and Technical Services',
+    '55': 'Management of Companies and Enterprises',
+    '56': 'Administrative and Support and Waste Management',
+    '61': 'Educational Services',
+    '62': 'Health Care and Social Assistance',
+    '71': 'Arts, Entertainment, and Recreation',
+    '72': 'Accommodation and Food Services',
+    '81': 'Other Services (except Public Administration)',
+    '92': 'Public Administration'
+}
+```
+
+### NAICS Validation
+- **Code Format**: Validate 2-6 digit NAICS codes
+- **Code Existence**: Verify against official NAICS database
+- **Code Currency**: Ensure codes are from current NAICS revision
+- **Hierarchy Consistency**: Validate parent-child code relationships
+
+## Keyword-Based Classification
+
+### Industry Keywords Database
+```python
+INDUSTRY_KEYWORDS = {
+    'telecommunications': {
+        'primary': ['internet service provider', 'isp', 'telecommunications', 'telecom', 'broadband'],
+        'secondary': ['fiber optic', 'cable internet', 'wireless', 'phone service', 'data center'],
+        'naics': '517'
+    },
+    'software': {
+        'primary': ['software development', 'software company', 'saas', 'technology'],
+        'secondary': ['application', 'platform', 'cloud computing', 'mobile app'],
+        'naics': '541511'
+    },
+    'healthcare': {
+        'primary': ['hospital', 'medical', 'healthcare', 'clinic', 'physician'],
+        'secondary': ['patient care', 'medical device', 'pharmaceutical', 'nursing'],
+        'naics': '62'
+    },
+    'manufacturing': {
+        'primary': ['manufacturing', 'factory', 'production', 'assembly'],
+        'secondary': ['industrial', 'fabrication', 'processing', 'machinery'],
+        'naics': '31-33'
+    }
+}
+```
+
+### Keyword Matching Algorithm
+```python
+def classify_by_keywords(business_description, company_name):
+    """
+    Classify industry based on keyword matching
+    """
+    text = f"{business_description} {company_name}".lower()
+    
+    scores = {}
+    for industry, keywords in INDUSTRY_KEYWORDS.items():
+        score = 0
+        
+        # Primary keywords (higher weight)
+        for keyword in keywords['primary']:
+            if keyword in text:
+                score += 3
+        
+        # Secondary keywords (lower weight)
+        for keyword in keywords['secondary']:
+            if keyword in text:
+                score += 1
+        
+        if score > 0:
+            scores[industry] = score
+    
+    # Return highest scoring industry
+    if scores:
+        return max(scores.items(), key=lambda x: x[1])
+    return None, 0
+```
+
+## AI-Powered Classification
+
+### Machine Learning Models
+- **Primary Model**: Fine-tuned BERT for industry classification
+- **Fallback Model**: Traditional ML with TF-IDF features
+- **Ensemble Method**: Combine multiple model predictions
+- **Confidence Scoring**: Provide confidence levels for classifications
+
+### Model Training Data
+```python
+TRAINING_SOURCES = [
+    'sec_filings',           # SEC company filings with industry codes
+    'business_directories',  # Categorized business directory listings
+    'government_databases',  # Government business registration data
+    'manual_classifications' # Human-verified classifications
+]
+```
+
+### AI Classification Pipeline
+```python
+from transformers import pipeline
+
+class AIIndustryClassifier:
+    def __init__(self):
+        self.classifier = pipeline(
+            "text-classification",
+            model="distilbert-base-uncased-finetuned-industry",
+            return_all_scores=True
+        )
+    
+    def classify(self, business_description, company_name):
+        text = f"Company: {company_name}. Description: {business_description}"
+        results = self.classifier(text)
+        
+        # Return top classification with confidence
+        top_result = max(results, key=lambda x: x['score'])
+        return top_result['label'], top_result['score']
+```
+
+## Classification Confidence System
+
+### Confidence Scoring
+```python
+def calculate_classification_confidence(classification_results):
+    """
+    Calculate overall confidence in industry classification
+    """
+    methods_used = len(classification_results)
+    agreement_score = calculate_agreement(classification_results)
+    source_quality = calculate_source_quality(classification_results)
+    
+    # Base confidence from number of methods
+    base_confidence = min(methods_used * 2, 6)
+    
+    # Agreement bonus (methods agree on classification)
+    agreement_bonus = agreement_score * 3
+    
+    # Source quality bonus
+    quality_bonus = source_quality * 1
+    
+    total_confidence = min(base_confidence + agreement_bonus + quality_bonus, 10)
+    return total_confidence
+```
+
+### Agreement Calculation
+- **Perfect Agreement**: All methods classify to same industry (bonus: +3)
+- **Partial Agreement**: Majority methods agree (bonus: +2)
+- **Related Industries**: Methods classify to related industries (bonus: +1)
+- **No Agreement**: Methods classify to unrelated industries (bonus: 0)
+
+## Industry Hierarchies and Relationships
+
+### Industry Relationships
+```python
+INDUSTRY_RELATIONSHIPS = {
+    'telecommunications': {
+        'parent': 'information',
+        'children': ['internet_service_provider', 'wireless_carrier', 'cable_company'],
+        'related': ['technology', 'utilities']
+    },
+    'software': {
+        'parent': 'professional_services',
+        'children': ['saas', 'mobile_apps', 'enterprise_software'],
+        'related': ['technology', 'consulting']
+    }
+}
+```
+
+### Hierarchical Classification
+- **Primary Industry**: Most specific applicable industry classification
+- **Secondary Industries**: Additional relevant industry classifications
+- **Parent Industry**: Broader category that encompasses primary industry
+- **Related Industries**: Industries with business relationships or overlap
+
+## Special Classification Rules
+
+### Multi-Industry Companies
+- **Conglomerates**: Companies operating in multiple unrelated industries
+- **Diversified Companies**: Companies with multiple related business lines
+- **Holding Companies**: Companies that own other companies
+- **Classification Strategy**: Identify primary revenue source for main classification
+
+### Industry-Specific Rules
+```python
+SPECIAL_RULES = {
+    'government_contractor': {
+        'condition': lambda desc: 'government contract' in desc.lower(),
+        'action': 'add_secondary_classification',
+        'classification': 'government_services'
+    },
+    'franchise_business': {
+        'condition': lambda desc: 'franchise' in desc.lower(),
+        'action': 'note_business_model',
+        'classification': 'franchise'
+    },
+    'non_profit': {
+        'condition': lambda company_type: company_type == 'non_profit',
+        'action': 'override_classification',
+        'classification': 'non_profit_organization'
+    }
+}
+```
+
+## Quality Assurance
+
+### Classification Validation
+- **Cross-Reference**: Validate against multiple data sources
+- **Peer Comparison**: Compare with similar companies in same industry
+- **Historical Consistency**: Check for consistency with previous classifications
+- **Expert Review**: Flag unusual classifications for manual review
+
+### Common Classification Errors
+```python
+COMMON_ERRORS = {
+    'overly_broad': 'Classification too general (e.g., "services" instead of specific service type)',
+    'overly_specific': 'Classification too narrow for company scope',
+    'outdated_industry': 'Using obsolete industry categories',
+    'mismatched_scale': 'Industry classification doesn\'t match company size',
+    'geographic_mismatch': 'Industry not applicable in company\'s geographic region'
+}
+```
+
+### Error Detection
+- **Outlier Detection**: Identify classifications that don't fit company profile
+- **Consistency Checks**: Ensure classification aligns with other company data
+- **Probability Scoring**: Flag low-probability classifications for review
+- **Manual Review Triggers**: Automatically flag questionable classifications
+
+## Output Standardization
+
+### Classification Output Format
+```python
+{
+    'industry_primary': 'telecommunications',
+    'industry_secondary': ['internet_service_provider', 'technology'],
+    'naics_code': '517311',
+    'naics_description': 'Wired Telecommunications Carriers',
+    'classification_method': 'ai_classification',
+    'confidence_score': 8.5,
+    'alternative_classifications': [
+        {'industry': 'utilities', 'confidence': 6.2},
+        {'industry': 'technology', 'confidence': 5.8}
+    ],
+    'classification_sources': ['business_description', 'company_website', 'sec_filing'],
+    'manual_review_required': False,
+    'classification_date': '2024-01-15'
+}
+```
+
+### Standardized Industry Names
+- Use consistent naming conventions across all classifications
+- Map various industry terms to standardized names
+- Maintain industry synonym database for consistency
+- Regular updates to reflect industry evolution
+
+
